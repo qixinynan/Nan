@@ -1,4 +1,5 @@
-import { NanObject } from "object/nanobject";
+import { NanObject } from "./object/nanobject";
+import { NText } from "./object/text";
 import { Nan } from "./nan";
 import { Sprite } from "./object/sprite";
 import { Transform } from "./utils/transform";
@@ -14,8 +15,7 @@ let img:CanvasImageSource = new Image();
 img.src = 'a.png';
 img.onload = ()=>{
   let sprite:Sprite = new Sprite("Hello123",new Transform(new Vector2(0,0),new Vector2(0,0)),img);
-  sprite.update = (obj:NanObject)=>{ //update会在每一帧执行一次
-    console.log("I'm being rendered!!!",obj);        
+  sprite.update = (obj:NanObject)=>{ //update会在每一帧执行一次    
     obj.transform.position.x += 1;  //移动物体位置     
   }
 
@@ -30,3 +30,17 @@ btn.onclick = ()=>{
   let obj:NanObject = Nan.getInstance().findObject("Hello123") as NanObject;
   obj.transform.position.x = 0; //移动物体位置 
 }
+
+nan.getCtx().font = "normal 36px Verdana";
+nan.getCtx().fillStyle = "#000000";
+let ntext: NText = new NText("text",new Transform(new Vector2(10,40),new Vector2(0,0)),"Hello World");
+ntext.update = (obj:NText)=>{
+  obj.text = "当前时间戳" + Date.now().toString();
+}
+
+nan.addObject(ntext);
+ntext.doInit((obj:NText)=>{
+  console.log("时间戳初始化",obj.text);
+})
+
+

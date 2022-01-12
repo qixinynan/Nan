@@ -13,7 +13,7 @@ export class Sprite extends NanObject {
    * @param transform 变换信息
    * @param image 图像
    */
-  constructor(name:String,transform:Transform,image:CanvasImageSource){
+  constructor(name: string,transform: Transform,image: CanvasImageSource){
     super(name,transform);
     this.image = image;
   }

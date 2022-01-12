@@ -75,7 +75,7 @@ export class Nan {
    * @param name 名称
    * @returns Nan对象
    */
-  findObject(name: String): NanObject | null {
+  findObject(name: string): NanObject | null {
     let result:NanObject | null = null;
     for (let i = 0; i < this.objList.length; i++) {
       let obj: NanObject = this.objList[i];
