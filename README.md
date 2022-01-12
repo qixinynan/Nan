@@ -8,7 +8,7 @@
 
 ```bash
 git clone https://github.com/Qixinies/Nan.git //克隆
-cd nan //进入目录
+cd Nan //进入目录
 npm install //安装所需依赖
 ```
 
