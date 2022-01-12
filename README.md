@@ -7,7 +7,7 @@
 南非常容易使用，首先你需要克隆南的源码 （由于南仍处于开发中，所以并未发布NPM包）
 
 ```bash
-git clone xxxxx //克隆
+git clone https://github.com/Qixinies/Nan.git //克隆
 cd nan //进入目录
 npm install //安装所需依赖
 ```
