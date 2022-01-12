@@ -1,3 +1,6 @@
+/**
+ * 二维数组
+ */
 export class Vector2 {
     x:number;
     y:number;
