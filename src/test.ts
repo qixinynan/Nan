@@ -13,7 +13,13 @@ img.onload = ()=>{
   let sprite:Sprite = new Sprite("Hello123",new Transform(new Vector2(0,0),new Vector2(0,0)),img);
   sprite.update = (obj:NanObject)=>{
     console.log("I'm being rendered!!!",obj);        
-    obj.transform.position.x += 50;      
+    obj.transform.position.x += 1;      
   }
   Nan.getInstance().addObject(sprite);
 } 
+
+const btn:HTMLButtonElement = document.getElementById("btn") as HTMLButtonElement;
+btn.onclick = ()=>{
+  let obj:NanObject = Nan.getInstance().findObject("Hello123") as NanObject;
+  obj.transform.position.x = 0;
+}
