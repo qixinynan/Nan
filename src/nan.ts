@@ -12,6 +12,7 @@ export class Nan {
     else 
       Nan.instance = this;
     this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    this.init();
   }
 
   static getInstance():Nan {
@@ -23,6 +24,20 @@ export class Nan {
 
   getCtx():CanvasRenderingContext2D {
     return this.ctx;
+  }
+
+  init() {
+    setInterval(this.update, 1000);
+  }
+
+
+  update() {
+    let nan = Nan.getInstance();
+    nan.ctx.clearRect(0, 0, nan.ctx.canvas.width, nan.ctx.canvas.height);
+    for (let i = 0; i < nan.objList.length; i++) {
+      let obj:NanObject = nan.objList[i];
+      obj._update();
+    }    
   }
 
   addObject(obj:NanObject) {   

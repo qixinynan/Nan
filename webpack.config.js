@@ -2,10 +2,13 @@ const path = require('path');
 
 module.exports = {  
   // entry: './src/nan.ts',
-  entry: './src/test.ts',
+  entry: {
+    nan: './src/nan.ts',
+    test: './src/test.ts'
+  },
   mode:'production',
   output: {
-    filename: 'bundle.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dist')
   },
   devServer: {
@@ -17,7 +20,6 @@ module.exports = {
   module: {
     rules: [{
       test:  /\.ts?$/,
-      // use: 'ts-loader',
       use:'awesome-typescript-loader',
       exclude: /node_modules/
     }]
