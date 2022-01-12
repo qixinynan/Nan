@@ -1,4 +1,4 @@
-import { NanObject } from "./nanobject.js";
+import { NanObject } from "./nanobject";
 export class Sprite extends NanObject {  
   
 }
