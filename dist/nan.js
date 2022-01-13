@@ -111,6 +111,9 @@ var Vector = /** @class */ (function () {
  */
 var Transform = /** @class */ (function () {
     function Transform(position, rotation, scale) {
+        if (position === void 0) { position = Vector.zero; }
+        if (rotation === void 0) { rotation = Vector.zero; }
+        if (scale === void 0) { scale = Vector.zero; }
         this.position = Vector.zero; //位置
         this.rotation = Vector.zero; //角度 (未实现)
         this.scale = Vector.zero; //缩放
@@ -263,4 +266,82 @@ var NText = /** @class */ (function (_super) {
     return NText;
 }(NanObject));
 
-export { GameObject, NText, Nan, NanObject, Sprite, Transform, Vector };
+var NLine = /** @class */ (function (_super) {
+    __extends(NLine, _super);
+    /**
+     *
+     * @param transform 变换信息
+     * @param path 线段路径信息，必须要一个二维数组（Vector）的二维数组。path.x为起始点,path.y为结束点
+     */
+    function NLine(transform, path) {
+        var _this = _super.call(this, transform) || this;
+        if (path.x.x && path.x.y && path.y.x && path.y.y) {
+            console.error("The variable path must be a Vector of Vector");
+        }
+        _this.path = path;
+        return _this;
+    }
+    NLine.prototype._update = function () {
+        _super.prototype._update.call(this);
+        this.context.moveTo(this.path.x.x, this.path.x.y);
+        this.context.lineTo(this.path.y.x, this.path.y.y);
+        this.context.stroke();
+    };
+    return NLine;
+}(NanObject));
+
+var Polygon = /** @class */ (function (_super) {
+    __extends(Polygon, _super);
+    /**
+     * 多边形
+     * @param transform 变换信息
+     * @param angles 边数
+     * @param radius 半径
+     * @param renderMethod 绘制方法 fill为实心 stroke为描边
+     * @param color 颜色
+     */
+    function Polygon(transform, angles, radius, renderMethod, color) {
+        if (renderMethod === void 0) { renderMethod = "fill"; }
+        if (color === void 0) { color = "#000000"; }
+        var _this = _super.call(this, transform) || this;
+        // 启始角度 （弧度制）
+        _this.startAngles = 0;
+        // 描边像素
+        _this.lineWidth = 1;
+        _this.angles = angles;
+        _this.renderMethod = renderMethod;
+        _this.color = color;
+        _this.radius = radius;
+        _this.lineColor = color;
+        return _this;
+    }
+    Polygon.prototype._update = function () {
+        _super.prototype._update.call(this);
+        this.context.strokeStyle = this.lineColor;
+        this.context.lineWidth = this.lineWidth;
+        this.context.beginPath();
+        var ang = 2 * Math.PI / this.angles;
+        for (var i = 0; i < this.angles; i++) {
+            var x = Math.cos(ang * i + this.startAngles) * this.radius + this.radius;
+            var y = Math.sin(ang * i + this.startAngles) * this.radius + this.radius;
+            console.log(this.radius, x, y);
+            this.context.lineTo(x, y);
+        }
+        this.context.closePath();
+        switch (this.renderMethod) {
+            case "fill":
+                this.context.fillStyle = this.color;
+                this.context.fill();
+                break;
+            case "stroke":
+                this.context.strokeStyle = this.color;
+                this.context.stroke();
+                break;
+            default:
+                console.error("Unknow render way: %s", this.renderMethod);
+        }
+    };
+    return Polygon;
+}(NanObject));
+
+export { GameObject, NLine, NText, Nan, NanObject, Polygon, Sprite, Transform, Vector };
