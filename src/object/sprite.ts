@@ -1,24 +1,24 @@
 import NanObject from "./nanobject";
 import Transform from "../utils/transform";
-import Vector2 from "../utils/vector";
+import Vector from "../utils/vector";
 /**
  * Sprite类
  * 渲染图片的对象都属于Sprite类，Sprite类属于Nan对象
  */
 export default class Sprite extends NanObject {  
   public image: CanvasImageSource; //图像
-  public size: Vector2;
+  public size: Vector;
   /**
    * 构造函数
    * @param name 对象名称
    * @param transform 变换信息
    * @param image 图像
    */
-  constructor(transform: Transform,image: CanvasImageSource, size?: Vector2){
+  constructor(transform: Transform,image: CanvasImageSource, size?: Vector){
     super(transform);
     this.image = image;
     if (!size) 
-      this.size = new Vector2(image.width as number,image.height as number);    
+      this.size = new Vector(image.width as number,image.height as number);    
     else
       this.size = size;
   }

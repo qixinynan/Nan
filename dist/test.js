@@ -1,7 +1,7 @@
-import {Nan,NText,Transform,Vector2,GameObject} from './nan.js';  
+import {Nan,NText,Transform,Vector,GameObject} from './nan.js';  
 class MyObject extends GameObject {
   init() {
-    this.transfrom = new Transform(new Vector2(10,10),new Vector2(0,0),new Vector2(1,1));    
+    this.transfrom = new Transform(new Vector(10,10),new Vector(0,0),new Vector(1,1));    
   }
 
   update = function update() {       

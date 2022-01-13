@@ -13,7 +13,7 @@ var Nan = /** @class */ (function () {
             Nan.instance = this;
         if (!canvas)
             console.error("Canvas can't be null");
-        this.ctx = canvas.getContext('2d');
+        this.context = canvas.getContext('2d');
         this.fps = fps;
         this.init();
     }
@@ -31,8 +31,8 @@ var Nan = /** @class */ (function () {
      * 获取Canvas渲染器
      * @returns Canvas渲染器
      */
-    Nan.prototype.getCtx = function () {
-        return this.ctx;
+    Nan.prototype.getContext = function () {
+        return this.context;
     };
     /**
      * 初始化
@@ -45,7 +45,7 @@ var Nan = /** @class */ (function () {
      */
     Nan.prototype.update = function () {
         var nan = Nan.getInstance();
-        nan.ctx.clearRect(0, 0, nan.ctx.canvas.width, nan.ctx.canvas.height); //清屏
+        nan.context.clearRect(0, 0, nan.context.canvas.width, nan.context.canvas.height); //清屏
         for (var i = 0; i < nan.objList.length; i++) {
             var gameObj = nan.objList[i];
             var nanObjList = gameObj.update();
@@ -95,14 +95,14 @@ var Nan = /** @class */ (function () {
 /**
  * 二维数组
  */
-var Vector2 = /** @class */ (function () {
-    function Vector2(x, y) {
+var Vector = /** @class */ (function () {
+    function Vector(x, y) {
         this.x = x;
         this.y = y;
     }
-    Vector2.zero = new Vector2(0, 0);
-    Vector2.one = new Vector2(1, 1);
-    return Vector2;
+    Vector.zero = new Vector(0, 0);
+    Vector.one = new Vector(1, 1);
+    return Vector;
 }());
 
 /**
@@ -111,9 +111,9 @@ var Vector2 = /** @class */ (function () {
  */
 var Transform = /** @class */ (function () {
     function Transform(position, rotation, scale) {
-        this.position = Vector2.zero; //位置
-        this.rotation = Vector2.zero; //角度 (未实现)
-        this.scale = Vector2.zero; //缩放
+        this.position = Vector.zero; //位置
+        this.rotation = Vector.zero; //角度 (未实现)
+        this.scale = Vector.zero; //缩放
         this.position = position;
         this.rotation = rotation;
         this.scale = scale;
@@ -126,7 +126,7 @@ var Transform = /** @class */ (function () {
 */
 var GameObject = /** @class */ (function () {
     function GameObject(name, transform) {
-        if (transform === void 0) { transform = new Transform(Vector2.zero, Vector2.zero, Vector2.one); }
+        if (transform === void 0) { transform = new Transform(Vector.zero, Vector.zero, Vector.one); }
         if (!name) {
             console.error("You must create GameObject with param name, Such as new GameObject('Name')");
         }
@@ -157,7 +157,7 @@ var NanObject = /** @class */ (function () {
      */
     function NanObject(transform) {
         this.transform = transform;
-        this.ctx = Nan.getInstance().getCtx();
+        this.context = Nan.getInstance().getContext();
     }
     /**
      * 如果Init方法已被赋值，则执行Init方法
@@ -227,7 +227,7 @@ var Sprite = /** @class */ (function (_super) {
         var _this = _super.call(this, transform) || this;
         _this.image = image;
         if (!size)
-            _this.size = new Vector2(image.width, image.height);
+            _this.size = new Vector(image.width, image.height);
         else
             _this.size = size;
         return _this;
@@ -237,7 +237,7 @@ var Sprite = /** @class */ (function (_super) {
      */
     Sprite.prototype._update = function () {
         _super.prototype._update.call(this);
-        this.ctx.drawImage(this.image, this.transform.position.x, this.transform.position.y, this.size.x * this.transform.scale.x, this.size.y * this.transform.scale.y);
+        this.context.drawImage(this.image, this.transform.position.x, this.transform.position.y, this.size.x * this.transform.scale.x, this.size.y * this.transform.scale.y);
     };
     /**
      * 设置图像
@@ -258,9 +258,9 @@ var NText = /** @class */ (function (_super) {
     }
     NText.prototype._update = function () {
         _super.prototype._update.call(this);
-        this.ctx.fillText(this.text, this.transform.position.x, this.transform.position.y);
+        this.context.fillText(this.text, this.transform.position.x, this.transform.position.y);
     };
     return NText;
 }(NanObject));
 
-export { GameObject, NText, Nan, NanObject, Sprite, Transform, Vector2 };
+export { GameObject, NText, Nan, NanObject, Sprite, Transform, Vector };
