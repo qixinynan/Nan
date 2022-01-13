@@ -7,7 +7,7 @@ export default class NanObject {
   public transform: Transform; //变换信息  
   public update: Function | undefined; //外部帧更新逻辑
   public state: Object | undefined; //状态，保存当前NanObject的变量等
-  protected ctx: CanvasRenderingContext2D; //一般为Nan单例中的ctx
+  protected context: CanvasRenderingContext2D; //一般为Nan单例中的ctx
   public init: Function | undefined; //外部初始化逻辑
   
   /**
@@ -16,7 +16,7 @@ export default class NanObject {
    */
   constructor (transform:Transform) {      
       this.transform = transform;
-      this.ctx = Nan.getInstance().getCtx();            
+      this.context = Nan.getInstance().getContext();            
   }
 
   /**

@@ -11,6 +11,6 @@ export default class NText extends NanObject {
 
   _update(): void {
     super._update();    
-    this.ctx.fillText(this.text,this.transform.position.x,this.transform.position.y);
+    this.context.fillText(this.text,this.transform.position.x,this.transform.position.y);
   }
 }

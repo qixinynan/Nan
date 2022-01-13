@@ -28,7 +28,7 @@ export default class Sprite extends NanObject {
    */
   _update(): void {
     super._update();    
-    this.ctx.drawImage(
+    this.context.drawImage(
       this.image,
       this.transform.position.x,
       this.transform.position.y,

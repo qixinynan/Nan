@@ -4,7 +4,7 @@ import Sprite from 'object/sprite'
 
 export default class Nan {  
     
-  private ctx: CanvasRenderingContext2D; //Canvas渲染器
+  private context: CanvasRenderingContext2D; //Canvas渲染器
   private objList: Array<GameObject> = []; //已加载的物体列表
   private static instance:Nan; //单例
   private fps: number; //帧率
@@ -22,7 +22,7 @@ export default class Nan {
 
     if (!canvas)
       console.error("Canvas can't be null")
-    this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;    
+    this.context = canvas.getContext('2d') as CanvasRenderingContext2D;    
     this.fps = fps;
     this.init();
   }
@@ -42,8 +42,8 @@ export default class Nan {
    * 获取Canvas渲染器
    * @returns Canvas渲染器
    */
-  getCtx(): CanvasRenderingContext2D {
-    return this.ctx;
+  getContext(): CanvasRenderingContext2D {
+    return this.context;
   }
 
   /**
@@ -58,7 +58,7 @@ export default class Nan {
    */
   update() {
     let nan = Nan.getInstance();
-    nan.ctx.clearRect(0, 0, nan.ctx.canvas.width, nan.ctx.canvas.height); //清屏
+    nan.context.clearRect(0, 0, nan.context.canvas.width, nan.context.canvas.height); //清屏
     for (let i = 0; i < nan.objList.length; i++) {
       let gameObj: GameObject = nan.objList[i];      
       let nanObjList: NanObject[] = gameObj.update() as NanObject[];      
