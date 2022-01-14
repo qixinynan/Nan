@@ -14,7 +14,7 @@ let nan:Nan = new Nan(canvas,60); //设置每秒60帧
 let img:CanvasImageSource = new Image();
 img.src = 'a.png';
 img.onload = ()=>{
-  let sprite:Sprite = new Sprite("Hello123",new Transform(new Vector2(0,0),new Vector2(0,0)),img);
+  let sprite:Sprite = new Sprite("Hello123",new Transform(Vector2.zero,Vector2.zero,Vector2.one),img);
   sprite.update = (obj:NanObject)=>{ //update会在每一帧执行一次    
     obj.transform.position.x += 1;  //移动物体位置     
   }
@@ -33,7 +33,7 @@ btn.onclick = ()=>{
 
 nan.getCtx().font = "normal 36px Verdana";
 nan.getCtx().fillStyle = "#000000";
-let ntext: NText = new NText("text",new Transform(new Vector2(10,40),new Vector2(0,0)),"Hello World");
+let ntext: NText = new NText("text",new Transform(new Vector2(10,40),Vector2.zero,Vector2.one),"Hello World");
 ntext.update = (obj:NText)=>{
   obj.text = "当前时间戳" + Date.now().toString();
 }
