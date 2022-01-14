@@ -121,6 +121,9 @@ var Transform = /** @class */ (function () {
     return Transform;
 }());
 
+/**
+* NanObject是Nan框架的基石。任何能够在Canvas上看得见的东西都应当是GameObject的派生类
+*/
 var GameObject = /** @class */ (function () {
     function GameObject(name, transform) {
         if (transform === void 0) { transform = new Transform(Vector2.zero, Vector2.zero, Vector2.one); }
@@ -132,15 +135,20 @@ var GameObject = /** @class */ (function () {
         this.init();
     }
     GameObject.prototype.init = function () { };
+    /**
+     * Update会在每帧调用一次
+     *
+     * Update应当返回一个NanObject的列表
+     * @returns NanObject[]
+     */
     GameObject.prototype.update = function () {
-        console.log("FUCK");
         return undefined;
     };
     return GameObject;
 }());
 
 /**
- * NanObject是Nan框架的基石。任何能够在屏幕上看得见的东西（Canvas中）都应当是NanObject（Nan对象）的派生类
+ * NanObject是GameObject框架的基石。是GameObject每次Update返回给Nan的就是NanObject的列表
  */
 var NanObject = /** @class */ (function () {
     /**
