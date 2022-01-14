@@ -1,9 +1,9 @@
-import { Transform } from "utils/transform";
-import { Nan } from "../nan"
+import Transform from "utils/transform";
+import Nan from "../nan"
 /**
  * NanObject是Nan框架的基石。任何能够在屏幕上看得见的东西（Canvas中）都应当是NanObject（Nan对象）的派生类
  */
-export class NanObject {
+export default class NanObject {
   public name: string; //名称
   public transform: Transform; //变换信息  
   public update: Function | undefined; //外部帧更新逻辑

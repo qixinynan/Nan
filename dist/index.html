@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hello Nan</title>
 </head>
 <body>
-    <button id="btn">Test</button>
-    <canvas id="canvas" width="1000px" height="600px"></canvas>
+  <canvas id="canvas" width="1000px" height="500px"></canvas>
 </body>
-<script type="module" src="./test.js"></script>
+<script type="module">
+  import {Nan,NText,Transform,Vector} from './nan.js';  
+  let nan = new Nan(document.getElementById('canvas'));    
+  let ntext = new NText("name",new Transform(new Vector(10,10),new Vector(0,0),new Vector(1,1)),"Hello World");
+  nan.addObject(ntext);
+</script>
 <style>
-    body{
-        background-color: black;
-    }
-    #canvas {
-        margin: 0 auto;
-        background-color: white;
-    }
+  #canvas {
+    background-color: rgb(229, 255, 0);
+  }
 </style>
 </html>

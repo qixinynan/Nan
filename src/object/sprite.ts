@@ -1,12 +1,12 @@
-import { NanObject } from "./nanobject";
-import { Transform } from "../utils/transform";
-import { Vector2 } from "../utils/vector";
+import NanObject from "./nanobject";
+import Transform from "../utils/transform";
+import Vector2 from "../utils/vector";
 
 /**
  * Sprite类
  * 渲染图片的对象都属于Sprite类，Sprite类属于Nan对象
  */
-export class Sprite extends NanObject {  
+export default class Sprite extends NanObject {  
   public image: CanvasImageSource; //图像
   public size: Vector2;
   /**

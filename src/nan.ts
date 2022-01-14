@@ -1,7 +1,7 @@
-import {NanObject} from 'object/nanobject'
-import {Sprite} from 'object/sprite'
+import NanObject from 'object/nanobject'
+import Sprite from 'object/sprite'
 
-export class Nan {  
+export default class Nan {  
     
   private ctx: CanvasRenderingContext2D; //Canvas渲染器
   private objList: Array<NanObject> = []; //已加载的物体列表
@@ -14,10 +14,13 @@ export class Nan {
    * @param fps 刷新帧率 
    */
   constructor(canvas: HTMLCanvasElement, fps: number = 60) {
-    if(Nan.instance) 
+    if (Nan.instance) 
       console.error("Nan is already created, You can use getInstance() to get it");          
     else 
-      Nan.instance = this;
+      Nan.instance = this;    
+
+    if (!canvas)
+      console.error("Canvas can't be null")
     this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;    
     this.fps = fps;
     this.init();

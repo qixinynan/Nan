@@ -1,7 +1,7 @@
-import { NanObject } from "./nanobject";
-import { Transform } from "utils/transform";
+import NanObject from "./nanobject";
+import Transform from "utils/transform";
 
-export class NText extends NanObject {
+export default class NText extends NanObject {
   public text: string;
 
   constructor(name: string,transform: Transform,text: string){
