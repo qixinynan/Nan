@@ -1,7 +1,7 @@
 import Transform from "utils/transform";
 import Nan from "../nan"
 /**
- * NanObject是Nan框架的基石。任何能够在屏幕上看得见的东西（Canvas中）都应当是NanObject（Nan对象）的派生类
+ * NanObject是GameObject框架的基石。是GameObject每次Update返回给Nan的就是NanObject的列表
  */
 export default class NanObject {  
   public transform: Transform; //变换信息  
