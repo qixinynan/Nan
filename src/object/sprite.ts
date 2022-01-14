@@ -1,7 +1,6 @@
 import NanObject from "./nanobject";
 import Transform from "../utils/transform";
 import Vector2 from "../utils/vector";
-
 /**
  * Sprite类
  * 渲染图片的对象都属于Sprite类，Sprite类属于Nan对象
