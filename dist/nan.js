@@ -276,9 +276,11 @@ var Sprite = /** @class */ (function (_super) {
 var NText = /** @class */ (function (_super) {
     __extends(NText, _super);
     function NText(transform, text, color) {
+        if (color === void 0) { color = "black"; }
         var _this = _super.call(this, transform) || this;
         _this.autoUpdateWidth = true;
         _this.text = text;
+        _this.color = color;
         return _this;
     }
     NText.prototype._update = function () {
@@ -288,6 +290,7 @@ var NText = /** @class */ (function (_super) {
             var textMesure = this.context.measureText(this.text);
             this.transform.size.x = textMesure.width;
         }
+        this.context.fillStyle = this.color;
         this.context.fillText(this.text, this.transform.position.x, this.transform.position.y + this.transform.size.y);
         _super.prototype._lateUpdate.call(this);
     };
@@ -301,7 +304,8 @@ var NLine = /** @class */ (function (_super) {
      * @param transform 变换信息
      * @param path 线段路径信息，必须要一个二维数组（Vector）的二维数组。path.x为起始点,path.y为结束点
      */
-    function NLine(transform, path) {
+    function NLine(transform, path, color) {
+        if (color === void 0) { color = "black"; }
         var _this = this;
         if (path.x.x && path.x.y && path.y.x && path.y.y) {
             console.error("The variable path must be a Vector of Vector");
@@ -310,11 +314,13 @@ var NLine = /** @class */ (function (_super) {
         transform.size.y = Math.abs(path.x.y - path.y.y);
         _this = _super.call(this, transform) || this;
         _this.path = path;
+        _this.color = color;
         return _this;
     }
     NLine.prototype._update = function () {
         _super.prototype._update.call(this);
         var pos = this.transform.position;
+        this.context.strokeStyle = this.color;
         this.context.moveTo(this.path.x.x + pos.x, this.path.x.y + pos.y);
         this.context.lineTo(this.path.y.x + pos.x, this.path.y.y + pos.y);
         this.context.stroke();
@@ -361,6 +367,7 @@ var Polygon = /** @class */ (function (_super) {
         switch (this.renderMethod) {
             case "fill":
                 this.context.fillStyle = this.color;
+                this.context.stroke();
                 this.context.fill();
                 break;
             case "stroke":
