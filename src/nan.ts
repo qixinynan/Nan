@@ -1,10 +1,11 @@
+import GameObject from 'object/gameobject';
 import NanObject from 'object/nanobject'
 import Sprite from 'object/sprite'
 
 export default class Nan {  
     
   private ctx: CanvasRenderingContext2D; //Canvas渲染器
-  private objList: Array<NanObject> = []; //已加载的物体列表
+  private objList: Array<GameObject> = []; //已加载的物体列表
   private static instance:Nan; //单例
   private fps: number; //帧率
 
@@ -59,17 +60,29 @@ export default class Nan {
     let nan = Nan.getInstance();
     nan.ctx.clearRect(0, 0, nan.ctx.canvas.width, nan.ctx.canvas.height); //清屏
     for (let i = 0; i < nan.objList.length; i++) {
-      let obj:NanObject = nan.objList[i];
-      obj._update();
+      let gameObj: GameObject = nan.objList[i];      
+      let nanObjList: NanObject[] = gameObj.update() as NanObject[];      
+      if (nanObjList) { 
+        if (!nanObjList.length) { //若没有length对象便就断言不是array对象
+          console.error("Function update() must return a array of GameObject");
+        }
+        for (let j = 0; j < nanObjList.length; j++) {
+          const nanObj = nanObjList[j];
+          nanObj._update();          
+        }
+      } 
     }    
   }
 
   /**
-   * 添加Nan对象
-   * @param obj Nan对象
+   * 添加GameObject对象
+   * @param obj GameObject对象
    */
-  addObject(obj: NanObject) {   
+  add(obj: GameObject) {   
     console.log("Add " + obj.name); 
+    if(!obj.update()) {
+      console.warn("The gameobject named %s hasn't return any NanObject in update()",obj.name);
+    }   
     this.objList.push(obj);
   }
 
@@ -78,10 +91,10 @@ export default class Nan {
    * @param name 名称
    * @returns Nan对象
    */
-  findObject(name: string): NanObject | null {
-    let result:NanObject | null = null;
+  findGameObject(name: string): GameObject | null {
+    let result:GameObject | null = null;
     for (let i = 0; i < this.objList.length; i++) {
-      let obj: NanObject = this.objList[i];
+      let obj: GameObject = this.objList[i];
       if (obj.name == name) {
         result = obj;
       }

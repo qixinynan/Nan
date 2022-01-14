@@ -47,16 +47,28 @@ var Nan = /** @class */ (function () {
         var nan = Nan.getInstance();
         nan.ctx.clearRect(0, 0, nan.ctx.canvas.width, nan.ctx.canvas.height); //清屏
         for (var i = 0; i < nan.objList.length; i++) {
-            var obj = nan.objList[i];
-            obj._update();
+            var gameObj = nan.objList[i];
+            var nanObjList = gameObj.update();
+            if (nanObjList) {
+                if (!nanObjList.length) { //若没有length对象便就断言不是array对象
+                    console.error("Function update() must return a array of GameObject");
+                }
+                for (var j = 0; j < nanObjList.length; j++) {
+                    var nanObj = nanObjList[j];
+                    nanObj._update();
+                }
+            }
         }
     };
     /**
-     * 添加Nan对象
-     * @param obj Nan对象
+     * 添加GameObject对象
+     * @param obj GameObject对象
      */
-    Nan.prototype.addObject = function (obj) {
+    Nan.prototype.add = function (obj) {
         console.log("Add " + obj.name);
+        if (!obj.update()) {
+            console.warn("The gameobject named %s hasn't return any NanObject in update()", obj.name);
+        }
         this.objList.push(obj);
     };
     /**
@@ -64,7 +76,7 @@ var Nan = /** @class */ (function () {
      * @param name 名称
      * @returns Nan对象
      */
-    Nan.prototype.findObject = function (name) {
+    Nan.prototype.findGameObject = function (name) {
         var result = null;
         for (var i = 0; i < this.objList.length; i++) {
             var obj = this.objList[i];
@@ -81,16 +93,61 @@ var Nan = /** @class */ (function () {
 }());
 
 /**
+ * 二维数组
+ */
+var Vector2 = /** @class */ (function () {
+    function Vector2(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    Vector2.zero = new Vector2(0, 0);
+    Vector2.one = new Vector2(1, 1);
+    return Vector2;
+}());
+
+/**
+ * 变换信息
+ * 变换信息类中保存的物体的位置和旋转角度等信息
+ */
+var Transform = /** @class */ (function () {
+    function Transform(position, rotation, scale) {
+        this.position = Vector2.zero; //位置
+        this.rotation = Vector2.zero; //角度 (未实现)
+        this.scale = Vector2.zero; //缩放
+        this.position = position;
+        this.rotation = rotation;
+        this.scale = scale;
+    }
+    return Transform;
+}());
+
+var GameObject = /** @class */ (function () {
+    function GameObject(name, transform) {
+        if (transform === void 0) { transform = new Transform(Vector2.zero, Vector2.zero, Vector2.one); }
+        if (!name) {
+            console.error("You must create GameObject with param name, Such as new GameObject('Name')");
+        }
+        this.name = name;
+        this.transfrom = transform;
+        this.init();
+    }
+    GameObject.prototype.init = function () { };
+    GameObject.prototype.update = function () {
+        console.log("FUCK");
+        return undefined;
+    };
+    return GameObject;
+}());
+
+/**
  * NanObject是Nan框架的基石。任何能够在屏幕上看得见的东西（Canvas中）都应当是NanObject（Nan对象）的派生类
  */
 var NanObject = /** @class */ (function () {
     /**
      * 构造初始化
-     * @param name 对象名称
      * @param transform 变换信息
      */
-    function NanObject(name, transform) {
-        this.name = name; //TODO 检查是否重名
+    function NanObject(transform) {
         this.transform = transform;
         this.ctx = Nan.getInstance().getCtx();
     }
@@ -147,19 +204,6 @@ function __extends(d, b) {
 }
 
 /**
- * 二维数组
- */
-var Vector2 = /** @class */ (function () {
-    function Vector2(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-    Vector2.zero = new Vector2(0, 0);
-    Vector2.one = new Vector2(1, 1);
-    return Vector2;
-}());
-
-/**
  * Sprite类
  * 渲染图片的对象都属于Sprite类，Sprite类属于Nan对象
  */
@@ -171,8 +215,8 @@ var Sprite = /** @class */ (function (_super) {
      * @param transform 变换信息
      * @param image 图像
      */
-    function Sprite(name, transform, image, size) {
-        var _this = _super.call(this, name, transform) || this;
+    function Sprite(transform, image, size) {
+        var _this = _super.call(this, transform) || this;
         _this.image = image;
         if (!size)
             _this.size = new Vector2(image.width, image.height);
@@ -199,8 +243,8 @@ var Sprite = /** @class */ (function (_super) {
 
 var NText = /** @class */ (function (_super) {
     __extends(NText, _super);
-    function NText(name, transform, text) {
-        var _this = _super.call(this, name, transform) || this;
+    function NText(transform, text) {
+        var _this = _super.call(this, transform) || this;
         _this.text = text;
         return _this;
     }
@@ -211,20 +255,4 @@ var NText = /** @class */ (function (_super) {
     return NText;
 }(NanObject));
 
-/**
- * 变换信息
- * 变换信息类中保存的物体的位置和旋转角度等信息
- */
-var Transform = /** @class */ (function () {
-    function Transform(position, rotation, scale) {
-        this.position = Vector2.zero; //位置
-        this.rotation = Vector2.zero; //角度 (未实现)
-        this.scale = Vector2.zero; //缩放
-        this.position = position;
-        this.rotation = rotation;
-        this.scale = scale;
-    }
-    return Transform;
-}());
-
-export { NText, Nan, NanObject, Sprite, Transform, Vector2 as Vector };
+export { GameObject, NText, Nan, NanObject, Sprite, Transform, Vector2 };

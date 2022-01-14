@@ -4,8 +4,8 @@ import Transform from "utils/transform";
 export default class NText extends NanObject {
   public text: string;
 
-  constructor(name: string,transform: Transform,text: string){
-    super(name,transform);
+  constructor(transform: Transform,text: string){
+    super(transform);
     this.text = text;
   }
 

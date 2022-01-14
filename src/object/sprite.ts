@@ -15,8 +15,8 @@ export default class Sprite extends NanObject {
    * @param transform 变换信息
    * @param image 图像
    */
-  constructor(name: string,transform: Transform,image: CanvasImageSource, size?: Vector2){
-    super(name,transform);
+  constructor(transform: Transform,image: CanvasImageSource, size?: Vector2){
+    super(transform);
     this.image = image;
     if (!size) 
       this.size = new Vector2(image.width as number,image.height as number);    

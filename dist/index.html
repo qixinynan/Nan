@@ -9,12 +9,7 @@
 <body>
   <canvas id="canvas" width="1000px" height="500px"></canvas>
 </body>
-<script type="module">
-  import {Nan,NText,Transform,Vector} from './nan.js';  
-  let nan = new Nan(document.getElementById('canvas'));    
-  let ntext = new NText("name",new Transform(new Vector(10,10),new Vector(0,0),new Vector(1,1)),"Hello World");
-  nan.addObject(ntext);
-</script>
+<script type="module" src="test.js"></script>
 <style>
   #canvas {
     background-color: rgb(229, 255, 0);
