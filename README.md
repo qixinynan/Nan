@@ -12,46 +12,32 @@ cd Nan //进入目录
 npm install //安装所需依赖
 ```
 
-你可以通过 ``npm run dev`` 来启动调试服务器。在浏览器中打开控制台中输出的网址 （一般来说是 http://localhost:8080/ ） 
+你可以通过 ``npm run dev`` 来启动调试模式。在你修改代码框架代码后，它会自动帮你编译到为/dist/nan.js文件。
 
 或者通过 ``npm run build`` 进行打包后手动部署到你的Web服务器,一般会打包到/dist文件夹下。无论你选择的是调试服务器还是打包，index.html都在/dist目录下。
 
-南默认提供了一个丑陋的案例，你可以在 ``/src/test.js`` 查看其源码或进行修改。
+南默认提供了一个丑陋的案例，你可以在 ``/src/test.js`` 查看其源码或进行修改。想要运行南提供的案例，你可能需要一个Web服务器，南推荐你使用Visual Studio的Live Server插件。这可以快速的搭建简易的调试用Web服务器
 
 
 ```javascript
-import { NanObject } from "object/nanobject";
-import { Nan } from "./nan";
-import { Sprite } from "./object/sprite";
-import { Transform } from "./utils/transform";
-import { Vector2 } from "./utils/vector";
-
-//获取Canvas
-const canvas:HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
-
-//实例化Nan 
-let nan:Nan = new Nan(canvas,60); //设置每秒60帧
-//创建与读取图片
-let img:CanvasImageSource = new Image();
-img.src = 'a.png';
-img.onload = ()=>{
-  let sprite:Sprite = new Sprite("Hello123",new Transform(new Vector2(0,0),new Vector2(0,0)),img);
-  sprite.update = (obj:NanObject)=>{ //update会在每一帧执行一次
-    console.log("I'm being rendered!!!",obj);        
-    obj.transform.position.x += 1;  //移动物体位置     
+import {Nan,NText,Transform,Vector2,GameObject} from './nan.js';  
+class MyObject extends GameObject {
+  init() {
+    this.transfrom = new Transform(new Vector2(10,10),new Vector2(0,0),new Vector2(1,1));    
   }
 
-  //你完全可以将这里的Nan.getInstance()替换为上面所实例化的nan。这里只是为展示Nan是单例的
-  Nan.getInstance().addObject(sprite);  //将创建的对象移交给Nan渲染
-} 
-
-//绑定按钮事件
-const btn:HTMLButtonElement = document.getElementById("btn") as HTMLButtonElement;
-btn.onclick = ()=>{
-  //查询对象
-  let obj:NanObject = Nan.getInstance().findObject("Hello123") as NanObject;
-  obj.transform.position.x = 0; //移动物体位置 
+  update = function update() {       
+    let ntext = new NText(this.transfrom,"Hello World");  
+    ntext.update = (obj)=>{   
+      obj.text = "现在时间: " + Date.now().toString();   
+    } 
+    return [ntext];              
+  }
 }
+
+let nan = new Nan(document.getElementById('canvas'));    
+nan.add(new MyObject("Name"));
+console.log(nan.objList);
 ```
 
 ## 对项目进行贡献
