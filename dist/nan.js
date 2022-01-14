@@ -110,16 +110,16 @@ var Vector = /** @class */ (function () {
  * 变换信息类中保存的物体的位置和旋转角度等信息
  */
 var Transform = /** @class */ (function () {
-    function Transform(position, rotation, scale) {
+    function Transform(position, rotation, size) {
         if (position === void 0) { position = Vector.zero; }
         if (rotation === void 0) { rotation = Vector.zero; }
-        if (scale === void 0) { scale = Vector.zero; }
+        if (size === void 0) { size = Vector.zero; }
         this.position = Vector.zero; //位置
         this.rotation = Vector.zero; //角度 (未实现)
-        this.scale = Vector.zero; //缩放
+        this.size = Vector.zero; //缩放
         this.position = position;
         this.rotation = rotation;
-        this.scale = scale;
+        this.size = size;
     }
     return Transform;
 }());
@@ -129,7 +129,7 @@ var Transform = /** @class */ (function () {
 */
 var GameObject = /** @class */ (function () {
     function GameObject(name, transform) {
-        if (transform === void 0) { transform = new Transform(Vector.zero, Vector.zero, Vector.one); }
+        if (transform === void 0) { transform = new Transform(Vector.zero, Vector.zero, Vector.zero); }
         if (!name) {
             console.error("You must create GameObject with param name, Such as new GameObject('Name')");
         }
@@ -180,6 +180,25 @@ var NanObject = /** @class */ (function () {
             this.update(this);
         }
     };
+    NanObject.prototype._lateUpdate = function () {
+        if (this.lateUpdate) {
+            this.lateUpdate(this);
+        }
+    };
+    NanObject.prototype.showFrameLine = function (color, lineWidth) {
+        if (color === void 0) { color = "red"; }
+        if (lineWidth === void 0) { lineWidth = 1; }
+        var originPos = this.transform.position;
+        var size = this.transform.size;
+        this.context.lineWidth = lineWidth;
+        this.context.moveTo(originPos.x, originPos.y);
+        this.context.lineTo(originPos.x + size.x, originPos.y);
+        this.context.lineTo(originPos.x + size.x, originPos.y + size.y);
+        this.context.lineTo(originPos.x, originPos.y + size.y);
+        this.context.lineTo(originPos.x, originPos.y);
+        this.context.strokeStyle = color;
+        this.context.stroke();
+    };
     return NanObject;
 }());
 
@@ -226,13 +245,14 @@ var Sprite = /** @class */ (function (_super) {
      * @param transform 变换信息
      * @param image 图像
      */
-    function Sprite(transform, image, size) {
+    function Sprite(transform, image, autoSize) {
+        if (autoSize === void 0) { autoSize = true; }
         var _this = _super.call(this, transform) || this;
         _this.image = image;
-        if (!size)
-            _this.size = new Vector(image.width, image.height);
+        if (autoSize)
+            _this.transform.size = new Vector(image.width, image.height);
         else
-            _this.size = size;
+            _this.transform.size = transform.size;
         return _this;
     }
     /**
@@ -240,7 +260,8 @@ var Sprite = /** @class */ (function (_super) {
      */
     Sprite.prototype._update = function () {
         _super.prototype._update.call(this);
-        this.context.drawImage(this.image, this.transform.position.x, this.transform.position.y, this.size.x * this.transform.scale.x, this.size.y * this.transform.scale.y);
+        this.context.drawImage(this.image, this.transform.position.x, this.transform.position.y, this.transform.size.x, this.transform.size.y);
+        _super.prototype._lateUpdate.call(this);
     };
     /**
      * 设置图像
@@ -254,14 +275,21 @@ var Sprite = /** @class */ (function (_super) {
 
 var NText = /** @class */ (function (_super) {
     __extends(NText, _super);
-    function NText(transform, text) {
+    function NText(transform, text, color) {
         var _this = _super.call(this, transform) || this;
+        _this.autoUpdateWidth = true;
         _this.text = text;
         return _this;
     }
     NText.prototype._update = function () {
         _super.prototype._update.call(this);
-        this.context.fillText(this.text, this.transform.position.x, this.transform.position.y);
+        this.context.font = this.transform.size.y + "px serif";
+        if (this.autoUpdateWidth) {
+            var textMesure = this.context.measureText(this.text);
+            this.transform.size.x = textMesure.width;
+        }
+        this.context.fillText(this.text, this.transform.position.x, this.transform.position.y + this.transform.size.y);
+        _super.prototype._lateUpdate.call(this);
     };
     return NText;
 }(NanObject));
@@ -274,18 +302,23 @@ var NLine = /** @class */ (function (_super) {
      * @param path 线段路径信息，必须要一个二维数组（Vector）的二维数组。path.x为起始点,path.y为结束点
      */
     function NLine(transform, path) {
-        var _this = _super.call(this, transform) || this;
+        var _this = this;
         if (path.x.x && path.x.y && path.y.x && path.y.y) {
             console.error("The variable path must be a Vector of Vector");
         }
+        transform.size.x = Math.abs(path.x.x - path.y.x);
+        transform.size.y = Math.abs(path.x.y - path.y.y);
+        _this = _super.call(this, transform) || this;
         _this.path = path;
         return _this;
     }
     NLine.prototype._update = function () {
         _super.prototype._update.call(this);
-        this.context.moveTo(this.path.x.x, this.path.x.y);
-        this.context.lineTo(this.path.y.x, this.path.y.y);
+        var pos = this.transform.position;
+        this.context.moveTo(this.path.x.x + pos.x, this.path.x.y + pos.y);
+        this.context.lineTo(this.path.y.x + pos.x, this.path.y.y + pos.y);
         this.context.stroke();
+        _super.prototype._lateUpdate.call(this);
     };
     return NLine;
 }(NanObject));
@@ -296,11 +329,10 @@ var Polygon = /** @class */ (function (_super) {
      * 多边形
      * @param transform 变换信息
      * @param angles 边数
-     * @param radius 半径
      * @param renderMethod 绘制方法 fill为实心 stroke为描边
      * @param color 颜色
      */
-    function Polygon(transform, angles, radius, renderMethod, color) {
+    function Polygon(transform, angles, renderMethod, color) {
         if (renderMethod === void 0) { renderMethod = "fill"; }
         if (color === void 0) { color = "#000000"; }
         var _this = _super.call(this, transform) || this;
@@ -311,7 +343,6 @@ var Polygon = /** @class */ (function (_super) {
         _this.angles = angles;
         _this.renderMethod = renderMethod;
         _this.color = color;
-        _this.radius = radius;
         _this.lineColor = color;
         return _this;
     }
@@ -322,9 +353,8 @@ var Polygon = /** @class */ (function (_super) {
         this.context.beginPath();
         var ang = 2 * Math.PI / this.angles;
         for (var i = 0; i < this.angles; i++) {
-            var x = Math.cos(ang * i + this.startAngles) * this.radius + this.radius;
-            var y = Math.sin(ang * i + this.startAngles) * this.radius + this.radius;
-            console.log(this.radius, x, y);
+            var x = Math.cos(ang * i + this.startAngles) * this.transform.size.x / 2 + this.transform.position.x + this.transform.size.x / 2;
+            var y = Math.sin(ang * i + this.startAngles) * this.transform.size.y / 2 + this.transform.position.y + this.transform.size.x / 2;
             this.context.lineTo(x, y);
         }
         this.context.closePath();
@@ -340,6 +370,7 @@ var Polygon = /** @class */ (function (_super) {
             default:
                 console.error("Unknow render way: %s", this.renderMethod);
         }
+        _super.prototype._lateUpdate.call(this);
     };
     return Polygon;
 }(NanObject));

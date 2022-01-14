@@ -11,17 +11,21 @@ export default class NLine extends NanObject {
    * @param path 线段路径信息，必须要一个二维数组（Vector）的二维数组。path.x为起始点,path.y为结束点
    */
   constructor(transform: Transform, path: Vector){
-    super(transform);
     if(path.x.x && path.x.y && path.y.x && path.y.y) {
       console.error("The variable path must be a Vector of Vector")
     }
-    this.path = path;
+    transform.size.x = Math.abs(path.x.x - path.y.x)
+    transform.size.y = Math.abs(path.x.y - path.y.y);
+    super(transform);    
+    this.path = path;    
   }
 
-  _update(): void {
-    super._update(); 
-    this.context.moveTo(this.path.x.x,this.path.x.y);
-    this.context.lineTo(this.path.y.x,this.path.y.y);
-    this.context.stroke();
+  _update(): void {     
+    super._update();
+    let pos: Vector = this.transform.position;
+    this.context.moveTo(this.path.x.x + pos.x, this.path.x.y + pos.y);
+    this.context.lineTo(this.path.y.x + pos.x, this.path.y.y + pos.y);
+    this.context.stroke();    
+    super._lateUpdate();
   }
 }

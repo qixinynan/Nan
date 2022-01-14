@@ -9,7 +9,7 @@ export default class GameObject {
   public name: string;  
   public transfrom: Transform; //变换信息  
 
-  constructor(name: string, transform: Transform = new Transform(Vector.zero,Vector.zero,Vector.one)) {
+  constructor(name: string, transform: Transform = new Transform(Vector.zero,Vector.zero,Vector.zero)) {
     if (!name) {
       console.error("You must create GameObject with param name, Such as new GameObject('Name')");      
     }

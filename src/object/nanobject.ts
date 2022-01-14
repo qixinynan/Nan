@@ -1,3 +1,4 @@
+import { Vector } from "index";
 import Transform from "utils/transform";
 import Nan from "../nan"
 /**
@@ -6,6 +7,7 @@ import Nan from "../nan"
 export default class NanObject {  
   public transform: Transform; //变换信息  
   public update: Function | undefined; //外部帧更新逻辑
+  public lateUpdate: Function | undefined;
   public state: Object | undefined; //状态，保存当前NanObject的变量等
   protected context: CanvasRenderingContext2D; //一般为Nan单例中的ctx
   public init: Function | undefined; //外部初始化逻辑
@@ -36,5 +38,27 @@ export default class NanObject {
     if(this.update) {
       this.update(this);
     }
+  }
+
+  _lateUpdate() {
+    if(this.lateUpdate) {
+      this.lateUpdate(this);
+    }
+  }
+  
+  showFrameLine(color:string = "red", lineWidth: number = 1) {    
+    let originPos: Vector = this.transform.position;
+    let size: Vector = this.transform.size;
+
+    this.context.lineWidth = lineWidth;
+
+    this.context.moveTo(originPos.x, originPos.y);
+    this.context.lineTo(originPos.x + size.x, originPos.y);
+    this.context.lineTo(originPos.x + size.x, originPos.y + size.y);
+    this.context.lineTo(originPos.x, originPos.y + size.y);
+    this.context.lineTo(originPos.x, originPos.y);
+
+    this.context.strokeStyle = color;
+    this.context.stroke();
   }
 }

@@ -6,35 +6,35 @@ import Vector from "../utils/vector";
  * 渲染图片的对象都属于Sprite类，Sprite类属于Nan对象
  */
 export default class Sprite extends NanObject {  
-  public image: CanvasImageSource; //图像
-  public size: Vector;
+  public image: CanvasImageSource; //图像  
   /**
    * 构造函数
    * @param name 对象名称
    * @param transform 变换信息
    * @param image 图像
    */
-  constructor(transform: Transform,image: CanvasImageSource, size?: Vector){
+  constructor(transform: Transform,image: CanvasImageSource, autoSize: boolean = true){    
     super(transform);
     this.image = image;
-    if (!size) 
-      this.size = new Vector(image.width as number,image.height as number);    
+    if (autoSize) 
+      this.transform.size = new Vector(image.width as number,image.height as number);    
     else
-      this.size = size;
+      this.transform.size = transform.size;    
   }
 
   /**
    * 内部帧更新函数
    */
-  _update(): void {
-    super._update();    
+  _update(): void {        
+    super._update();
     this.context.drawImage(
       this.image,
       this.transform.position.x,
       this.transform.position.y,
-      this.size.x * this.transform.scale.x,
-      this.size.y * this.transform.scale.y
-    );
+      this.transform.size.x,
+      this.transform.size.y
+    );    
+    super._lateUpdate();
   }
 
   /**
