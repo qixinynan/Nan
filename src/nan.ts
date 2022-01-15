@@ -12,6 +12,8 @@ export default class Nan {
   private originPosition: Vector = new Vector(0, 0);
   private originScale: Vector = new Vector(1, 1);
   public canvasDraggable: boolean = false; //画布可否拖拽
+  public canvasScalable: boolean = false; //FIXME 放大后不停拖拽移动位置后再缩小会有严重渲染错误  
+  public extraCleanRect:Vector =  new Vector(0,0); //额外擦除区域
 
   private isDraging = false;
   private isMouseDown = false;
@@ -79,7 +81,11 @@ export default class Nan {
   update() {
     let nan = Nan.getInstance();
     let allNanObjList: NanObject[] = [];    
-    nan.context.clearRect(nan.originPosition.x, nan.originPosition.y, nan.context.canvas.width / nan.originScale.x, nan.context.canvas.height / nan.originScale.y); //清屏
+    let cleanX = nan.originPosition.x,
+        cleanY = nan.originPosition.y,
+        canvasWidth = nan.context.canvas.width,
+        canvasHeight = nan.context.canvas.height;        
+    nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏        
     for (let i = 0; i < nan.objList.length; i++) {
       let gameObj: GameObject = nan.objList[i];      
       let nanObjList: NanObject[] = gameObj.update() as NanObject[];      
@@ -97,10 +103,8 @@ export default class Nan {
     for (let i = 0; i < allNanObjList.length; i++) {
       allNanObjList[i]._lateUpdate();      
     }
-    nan.lateUpdate();
-    nan.context.rect(nan.originPosition.x, nan.originPosition.y, nan.context.canvas.width / nan.originScale.x, nan.context.canvas.height / nan.originScale.y); //清屏
-    nan.context.strokeStyle = "red";
-    nan.context.lineWidth = 15;
+    nan.lateUpdate();        
+    nan.context.rect(cleanX, cleanY, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏        
     nan.context.stroke();
   }
 
@@ -209,6 +213,7 @@ export default class Nan {
    * 缩放功能   
    */
   onWheel(e: WheelEvent) {
+
     let nan = Nan.getInstance();
         
     if (e.deltaY > 0) {
@@ -230,7 +235,7 @@ export default class Nan {
   }
 
   /**
-   * 移动**到**坐标原点并记录
+   * 移动“到”坐标原点并记录
    * @param x x
    * @param y x
    */
@@ -248,9 +253,10 @@ export default class Nan {
     // context.translate((_left + _width/2) - (_width / 2) * scale, (_top + _height/2)  - (_height / 2) * scale);
     let cWidth = this.context.canvas.width;
     let cHeight = this.context.canvas.height;
-    this.translateOrigin(cWidth / 4, cHeight / 4)
-    this.context.scale(x, y);    
-    this.originScale = new Vector(this.originScale.x * x, this.originScale.y * y)    
+    // this.translateOrigin(cWidth / 4, cHeight / 4)    
+    // this.translateOrigin((cWidth + this.originPosition.x)/2,(cHeight + this.originPosition.y))    
+    this.context.scale(x, y);        
+    this.originScale = new Vector(this.originScale.x * x, this.originScale.y * y)        
     console.log(this.originScale);;
   }
 

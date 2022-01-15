@@ -23,6 +23,7 @@ var Nan = /** @class */ (function () {
         this.originPosition = new Vector(0, 0);
         this.originScale = new Vector(1, 1);
         this.canvasDraggable = false; //画布可否拖拽
+        this.extraCleanRect = new Vector(0, 0); //额外擦除区域
         this.isDraging = false;
         this.isMouseDown = false;
         if (Nan.instance)
@@ -77,7 +78,8 @@ var Nan = /** @class */ (function () {
     Nan.prototype.update = function () {
         var nan = Nan.getInstance();
         var allNanObjList = [];
-        nan.context.clearRect(nan.originPosition.x, nan.originPosition.y, nan.context.canvas.width / nan.originScale.x, nan.context.canvas.height / nan.originScale.y); //清屏
+        var cleanX = nan.originPosition.x, cleanY = nan.originPosition.y, canvasWidth = nan.context.canvas.width, canvasHeight = nan.context.canvas.height;
+        nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x + nan.extraCleanRect.x, canvasHeight / nan.originScale.y + nan.extraCleanRect.y); //清屏        
         for (var i = 0; i < nan.objList.length; i++) {
             var gameObj = nan.objList[i];
             var nanObjList = gameObj.update();
@@ -96,9 +98,7 @@ var Nan = /** @class */ (function () {
             allNanObjList[i]._lateUpdate();
         }
         nan.lateUpdate();
-        nan.context.rect(nan.originPosition.x, nan.originPosition.y, nan.context.canvas.width / nan.originScale.x, nan.context.canvas.height / nan.originScale.y); //清屏
-        nan.context.strokeStyle = "red";
-        nan.context.lineWidth = 15;
+        nan.context.rect(cleanX, cleanY, canvasWidth / nan.originScale.x + nan.extraCleanRect.x, canvasHeight / nan.originScale.y + nan.extraCleanRect.y); //清屏        
         nan.context.stroke();
     };
     /**
@@ -216,7 +216,7 @@ var Nan = /** @class */ (function () {
         this.originPosition = new Vector(this.originPosition.x - x, this.originPosition.y - y);
     };
     /**
-     * 移动**到**坐标原点并记录
+     * 移动“到”坐标原点并记录
      * @param x x
      * @param y x
      */
@@ -231,9 +231,10 @@ var Nan = /** @class */ (function () {
     //TODO 以中心缩放   
     Nan.prototype.scaleOrigin = function (x, y) {
         // context.translate((_left + _width/2) - (_width / 2) * scale, (_top + _height/2)  - (_height / 2) * scale);
-        var cWidth = this.context.canvas.width;
-        var cHeight = this.context.canvas.height;
-        this.translateOrigin(cWidth / 4, cHeight / 4);
+        this.context.canvas.width;
+        this.context.canvas.height;
+        // this.translateOrigin(cWidth / 4, cHeight / 4)    
+        // this.translateOrigin((cWidth + this.originPosition.x)/2,(cHeight + this.originPosition.y))    
         this.context.scale(x, y);
         this.originScale = new Vector(this.originScale.x * x, this.originScale.y * y);
         console.log(this.originScale);
