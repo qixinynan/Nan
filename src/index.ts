@@ -11,10 +11,11 @@ import Polygon from 'object/polygon'
 //utils
 import Vector from './utils/vector'
 import Transform from './utils/transform'
+import Utils from 'utils/utils'
 
 export {
   Nan, //framework
   GameObject,NanObject, //base
   Sprite,NText,NLine,Polygon, //object
-  Vector,Transform //utils
+  Utils,Vector,Transform //utils
 }

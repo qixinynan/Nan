@@ -14,6 +14,7 @@ var Nan = /** @class */ (function () {
         if (!canvas)
             console.error("Canvas can't be null");
         this.context = canvas.getContext('2d');
+        canvas.addEventListener('click', this.clickEvent);
         this.fps = fps;
         this.init();
     }
@@ -89,6 +90,19 @@ var Nan = /** @class */ (function () {
         }
         return result;
     };
+    Nan.prototype.clickEvent = function (e) {
+        var nan = Nan.getInstance();
+        for (var i = 0; i < nan.objList.length; i++) {
+            var obj = nan.objList[i];
+            var xOffset = e.x - obj.transform.position.x;
+            var yOffset = e.y - obj.transform.position.y;
+            if (0 <= xOffset && xOffset <= obj.collider.x && 0 <= yOffset && yOffset <= obj.collider.y) {
+                if (obj.onClick) {
+                    obj.onClick();
+                }
+            }
+        }
+    };
     return Nan;
 }());
 
@@ -134,7 +148,8 @@ var GameObject = /** @class */ (function () {
             console.error("You must create GameObject with param name, Such as new GameObject('Name')");
         }
         this.name = name;
-        this.transfrom = transform;
+        this.transform = transform;
+        this.collider = transform.size;
         this.init();
     }
     GameObject.prototype.init = function () { };
@@ -146,6 +161,21 @@ var GameObject = /** @class */ (function () {
      */
     GameObject.prototype.update = function () {
         return undefined;
+    };
+    GameObject.prototype.showColliderLine = function (color, lineWidth) {
+        if (color === void 0) { color = "yellow"; }
+        if (lineWidth === void 0) { lineWidth = 1; }
+        var context = Nan.getInstance().getContext();
+        var originPos = this.transform.position;
+        var size = this.collider;
+        context.lineWidth = lineWidth;
+        context.moveTo(originPos.x, originPos.y);
+        context.lineTo(originPos.x + size.x, originPos.y);
+        context.lineTo(originPos.x + size.x, originPos.y + size.y);
+        context.lineTo(originPos.x, originPos.y + size.y);
+        context.lineTo(originPos.x, originPos.y);
+        context.strokeStyle = color;
+        context.stroke();
     };
     return GameObject;
 }());
@@ -354,7 +384,6 @@ var Polygon = /** @class */ (function (_super) {
     }
     Polygon.prototype._update = function () {
         _super.prototype._update.call(this);
-        this.context.strokeStyle = this.lineColor;
         this.context.lineWidth = this.lineWidth;
         this.context.beginPath();
         var ang = 2 * Math.PI / this.angles;
@@ -367,6 +396,7 @@ var Polygon = /** @class */ (function (_super) {
         switch (this.renderMethod) {
             case "fill":
                 this.context.fillStyle = this.color;
+                this.context.strokeStyle = this.lineColor;
                 this.context.stroke();
                 this.context.fill();
                 break;
@@ -382,4 +412,18 @@ var Polygon = /** @class */ (function (_super) {
     return Polygon;
 }(NanObject));
 
-export { GameObject, NLine, NText, Nan, NanObject, Polygon, Sprite, Transform, Vector };
+var Utils = /** @class */ (function () {
+    function Utils() {
+    }
+    Utils.getRandomColor = function () {
+        var colorStr = "#";
+        var randomArr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
+        for (var i = 0; i < 6; i++) {
+            colorStr += randomArr[Math.ceil(Math.random() * (15 - 0) + 0)];
+        }
+        return colorStr;
+    };
+    return Utils;
+}());
+
+export { GameObject, NLine, NText, Nan, NanObject, Polygon, Sprite, Transform, Utils, Vector };

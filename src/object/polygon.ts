@@ -30,24 +30,23 @@ export default class Polygon extends NanObject{
   }
 
   _update(): void {
-    super._update();  
-    this.context.strokeStyle = this.lineColor;
-    this.context.lineWidth = this.lineWidth;      
+    super._update();                  
+    this.context.lineWidth = this.lineWidth;          
     this.context.beginPath();
     let ang: number = 2 * Math.PI / this.angles;
 
     for (let i = 0; i < this.angles ; i++) {
       let x:number = Math.cos(ang * i + this.startAngles) * this.transform.size.x / 2 + this.transform.position.x + this.transform.size.x / 2;
-      let y:number = Math.sin(ang * i + this.startAngles) * this.transform.size.y / 2 + this.transform.position.y + this.transform.size.x / 2;      
-
-      this.context.lineTo(x,y);      
+      let y:number = Math.sin(ang * i + this.startAngles) * this.transform.size.y / 2 + this.transform.position.y + this.transform.size.x / 2;                  
+      this.context.lineTo(x,y);            
     }
 
     this.context.closePath();
     
     switch (this.renderMethod) {
       case "fill":
-        this.context.fillStyle = this.color;     
+        this.context.fillStyle = this.color;
+        this.context.strokeStyle = this.lineColor;     
         this.context.stroke();   
         this.context.fill();
         break;

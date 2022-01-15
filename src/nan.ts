@@ -23,6 +23,7 @@ export default class Nan {
     if (!canvas)
       console.error("Canvas can't be null")
     this.context = canvas.getContext('2d') as CanvasRenderingContext2D;    
+    canvas.addEventListener('click',this.clickEvent);
     this.fps = fps;
     this.init();
   }
@@ -103,6 +104,20 @@ export default class Nan {
       console.error("Can't find object by name: %s", name);
     }
     return result;
+  }
+
+  clickEvent(e: MouseEvent) {    
+    let nan = Nan.getInstance();
+    for (let i = 0; i < nan.objList.length ; i++) {
+      const obj: GameObject = nan.objList[i];
+      let xOffset = e.x -obj.transform.position.x;
+      let yOffset = e.y -obj.transform.position.y;
+      if (0 <= xOffset && xOffset <= obj.collider.x && 0 <= yOffset && yOffset <= obj.collider.y) {        
+        if (obj.onClick) {
+          obj.onClick();
+        }
+      }
+    }
   }
 
 }

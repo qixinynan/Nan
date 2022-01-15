@@ -1,4 +1,6 @@
 
+import { Utils } from "index";
+import Nan from "nan";
 import Transform from "utils/transform";
 import Vector from "utils/vector";
 import NanObject from "./nanobject";
@@ -7,14 +9,17 @@ import NanObject from "./nanobject";
 */
 export default class GameObject {
   public name: string;  
-  public transfrom: Transform; //变换信息  
+  public transform: Transform; //变换信息
+  public collider: Vector;  
+  public onClick: Function | undefined;
 
   constructor(name: string, transform: Transform = new Transform(Vector.zero,Vector.zero,Vector.zero)) {
     if (!name) {
       console.error("You must create GameObject with param name, Such as new GameObject('Name')");      
     }
     this.name = name;
-    this.transfrom = transform;
+    this.transform = transform;
+    this.collider = transform.size;
     this.init();
   }
   init() {}
@@ -26,6 +31,21 @@ export default class GameObject {
    * @returns NanObject[]
    */
   update(): NanObject[] | undefined {    
-    return undefined
+    return undefined;    
+  }
+
+  showColliderLine(color:string = "yellow", lineWidth: number = 1) {
+    let context: CanvasRenderingContext2D = Nan.getInstance().getContext();
+    let originPos: Vector = this.transform.position;
+    let size: Vector = this.collider;    
+    context.lineWidth = lineWidth;
+
+    context.moveTo(originPos.x, originPos.y);
+    context.lineTo(originPos.x + size.x, originPos.y);
+    context.lineTo(originPos.x + size.x, originPos.y + size.y);
+    context.lineTo(originPos.x, originPos.y + size.y);
+    context.lineTo(originPos.x, originPos.y);    
+    context.strokeStyle = color;    
+    context.stroke();
   }
 } 

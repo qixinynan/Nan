@@ -22,7 +22,7 @@ npm install //安装所需依赖
 import { Nan, NText, Transform, Vector, GameObject } from "./nan.js";
 class MyObject extends GameObject {
   init() {
-    this.transfrom = new Transform(
+    this.transform = new Transform(
       new Vector(10, 10),
       new Vector(0, 0),
       new Vector(1, 1)
@@ -30,7 +30,7 @@ class MyObject extends GameObject {
   }
 
   update = function update() {
-    let ntext = new NText(this.transfrom, "Hello World");
+    let ntext = new NText(this.transform, "Hello World");
     ntext.update = (obj) => {
       obj.text = "现在时间: " + Date.now().toString();
     };
