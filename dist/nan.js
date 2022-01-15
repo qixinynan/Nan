@@ -328,14 +328,15 @@ var Polygon = /** @class */ (function (_super) {
         this.context.beginPath();
         var ang = 2 * Math.PI / this.angles;
         for (var i = 0; i < this.angles; i++) {
-            var x = Math.cos(ang * i + this.startAngles) * this.radius + this.radius;
-            var y = Math.sin(ang * i + this.startAngles) * this.radius + this.radius;
+            var x = Math.cos(ang * i + this.startAngles) * this.radius + this.radius + this.transform.position.x;
+            var y = Math.sin(ang * i + this.startAngles) * this.radius + this.radius + this.transform.position.y;
             this.context.lineTo(x, y);
         }
         this.context.closePath();
         switch (this.renderMethod) {
             case "fill":
                 this.context.fillStyle = this.color;
+                this.context.stroke();
                 this.context.fill();
                 break;
             case "stroke":
