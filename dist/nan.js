@@ -254,13 +254,16 @@ var Sprite = /** @class */ (function (_super) {
 
 var NText = /** @class */ (function (_super) {
     __extends(NText, _super);
-    function NText(transform, text) {
+    function NText(transform, text, color) {
+        if (color === void 0) { color = "black"; }
         var _this = _super.call(this, transform) || this;
         _this.text = text;
+        _this.color = color;
         return _this;
     }
     NText.prototype._update = function () {
         _super.prototype._update.call(this);
+        this.context.fillStyle = this.color;
         this.context.fillText(this.text, this.transform.position.x, this.transform.position.y);
     };
     return NText;
@@ -273,16 +276,19 @@ var NLine = /** @class */ (function (_super) {
      * @param transform 变换信息
      * @param path 线段路径信息，必须要一个二维数组（Vector）的二维数组。path.x为起始点,path.y为结束点
      */
-    function NLine(transform, path) {
+    function NLine(transform, path, color) {
+        if (color === void 0) { color = "black"; }
         var _this = _super.call(this, transform) || this;
         if (path.x.x && path.x.y && path.y.x && path.y.y) {
             console.error("The variable path must be a Vector of Vector");
         }
         _this.path = path;
+        _this.color = color;
         return _this;
     }
     NLine.prototype._update = function () {
         _super.prototype._update.call(this);
+        this.context.strokeStyle = this.color;
         this.context.moveTo(this.path.x.x, this.path.x.y);
         this.context.lineTo(this.path.y.x, this.path.y.y);
         this.context.stroke();
@@ -324,7 +330,6 @@ var Polygon = /** @class */ (function (_super) {
         for (var i = 0; i < this.angles; i++) {
             var x = Math.cos(ang * i + this.startAngles) * this.radius + this.radius;
             var y = Math.sin(ang * i + this.startAngles) * this.radius + this.radius;
-            console.log(this.radius, x, y);
             this.context.lineTo(x, y);
         }
         this.context.closePath();

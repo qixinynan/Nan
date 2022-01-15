@@ -5,8 +5,8 @@ class MyObject extends GameObject {
   }
 
   update = function update() {       
-    let ntext = new NText(this.transfrom, "Hello World");  
-    let nline = new NLine(this.transfrom, new Vector(new Vector(0,0),new Vector(100,100)));
+    let ntext = new NText(this.transfrom, "Hello World","green");
+    let nline = new NLine(this.transfrom, new Vector(new Vector(0,0),new Vector(100,100)),"black");    
     let phy = new Polygon(new Transform(new Vector(100,100)), 6, 100,"fill","red");
     phy.lineColor = "black";
     phy.lineWidth = 2;

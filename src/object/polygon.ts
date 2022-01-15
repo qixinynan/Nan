@@ -42,8 +42,7 @@ export default class Polygon extends NanObject{
     for (let i = 0; i < this.angles ; i++) {
 
       let x:number = Math.cos(ang * i + this.startAngles) * this.radius + this.radius;
-      let y:number = Math.sin(ang * i + this.startAngles) * this.radius + this.radius;
-      console.log(this.radius,x,y);
+      let y:number = Math.sin(ang * i + this.startAngles) * this.radius + this.radius;      
       this.context.lineTo(x,y);      
     }
 
