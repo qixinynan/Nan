@@ -27,7 +27,6 @@ export default class NLine extends NanObject {
     this.context.strokeStyle = this.color;
     this.context.moveTo(this.path.x.x + pos.x, this.path.x.y + pos.y);
     this.context.lineTo(this.path.y.x + pos.x, this.path.y.y + pos.y);
-    this.context.stroke();    
-    super._lateUpdate();
+    this.context.stroke();        
   }
 }

@@ -21,7 +21,6 @@ export default class NText extends NanObject {
       this.transform.size.x = textMesure.width;
     }
     this.context.fillStyle = this.color;
-    this.context.fillText(this.text,this.transform.position.x,this.transform.position.y + this.transform.size.y );    
-    super._lateUpdate();
+    this.context.fillText(this.text,this.transform.position.x,this.transform.position.y + this.transform.size.y );        
   }
 }

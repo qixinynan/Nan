@@ -21,6 +21,7 @@ var Nan = /** @class */ (function () {
         if (fps === void 0) { fps = 60; }
         this.objList = []; //已加载的物体列表
         this.originPosition = new Vector(0, 0);
+        this.originScale = new Vector(1, 1);
         this.canvasDraggable = false; //画布可否拖拽
         this.isDraging = false;
         this.isMouseDown = false;
@@ -48,6 +49,7 @@ var Nan = /** @class */ (function () {
         var canvas = Nan.getInstance().context.canvas;
         canvas.onmouseup = this.clickEvent;
         canvas.onmousedown = this.mouseDown;
+        canvas.onwheel = this.onWheel;
         canvas.oncontextmenu = function (e) {
             e.preventDefault();
         };
@@ -74,7 +76,8 @@ var Nan = /** @class */ (function () {
      */
     Nan.prototype.update = function () {
         var nan = Nan.getInstance();
-        nan.context.clearRect(nan.originPosition.x, nan.originPosition.y, nan.context.canvas.width, nan.context.canvas.height); //清屏
+        var allNanObjList = [];
+        nan.context.clearRect(nan.originPosition.x, nan.originPosition.y, nan.context.canvas.width / nan.originScale.x, nan.context.canvas.height / nan.originScale.y); //清屏
         for (var i = 0; i < nan.objList.length; i++) {
             var gameObj = nan.objList[i];
             var nanObjList = gameObj.update();
@@ -84,11 +87,19 @@ var Nan = /** @class */ (function () {
                 }
                 for (var j = 0; j < nanObjList.length; j++) {
                     var nanObj = nanObjList[j];
+                    allNanObjList.push(nanObj);
                     nanObj._update();
                 }
             }
         }
+        for (var i = 0; i < allNanObjList.length; i++) {
+            allNanObjList[i]._lateUpdate();
+        }
         nan.lateUpdate();
+        nan.context.rect(nan.originPosition.x, nan.originPosition.y, nan.context.canvas.width / nan.originScale.x, nan.context.canvas.height / nan.originScale.y); //清屏
+        nan.context.strokeStyle = "red";
+        nan.context.lineWidth = 15;
+        nan.context.stroke();
     };
     /**
      * update执行后执行
@@ -182,12 +193,50 @@ var Nan = /** @class */ (function () {
             }
         };
     };
+    /**
+     * 监听滚轮事件
+     * 缩放功能
+     */
+    Nan.prototype.onWheel = function (e) {
+        var nan = Nan.getInstance();
+        if (e.deltaY > 0) {
+            nan.scaleOrigin(0.8, 0.8);
+        }
+        else {
+            nan.scaleOrigin(1.2, 1.2);
+        }
+    };
+    /**
+     * 移动坐标原点并记录
+     * @param x x
+     * @param y y
+     */
     Nan.prototype.translateOrigin = function (x, y) {
         this.context.translate(x, y);
         this.originPosition = new Vector(this.originPosition.x - x, this.originPosition.y - y);
     };
+    /**
+     * 移动**到**坐标原点并记录
+     * @param x x
+     * @param y x
+     */
     Nan.prototype.moveOrigin = function (x, y) {
         this.translateOrigin(this.originPosition.x + x, this.originPosition.y + y);
+    };
+    /**
+     * 缩放画布
+     * @param x x
+     * @param y x
+     */
+    //TODO 以中心缩放   
+    Nan.prototype.scaleOrigin = function (x, y) {
+        // context.translate((_left + _width/2) - (_width / 2) * scale, (_top + _height/2)  - (_height / 2) * scale);
+        var cWidth = this.context.canvas.width;
+        var cHeight = this.context.canvas.height;
+        this.translateOrigin(cWidth / 4, cHeight / 4);
+        this.context.scale(x, y);
+        this.originScale = new Vector(this.originScale.x * x, this.originScale.y * y);
+        console.log(this.originScale);
     };
     return Nan;
 }());
@@ -383,7 +432,6 @@ var Sprite = /** @class */ (function (_super) {
     Sprite.prototype._update = function () {
         _super.prototype._update.call(this);
         this.context.drawImage(this.image, this.transform.position.x, this.transform.position.y, this.transform.size.x, this.transform.size.y);
-        _super.prototype._lateUpdate.call(this);
     };
     /**
      * 设置图像
@@ -414,7 +462,6 @@ var NText = /** @class */ (function (_super) {
         }
         this.context.fillStyle = this.color;
         this.context.fillText(this.text, this.transform.position.x, this.transform.position.y + this.transform.size.y);
-        _super.prototype._lateUpdate.call(this);
     };
     return NText;
 }(NanObject));
@@ -446,7 +493,6 @@ var NLine = /** @class */ (function (_super) {
         this.context.moveTo(this.path.x.x + pos.x, this.path.x.y + pos.y);
         this.context.lineTo(this.path.y.x + pos.x, this.path.y.y + pos.y);
         this.context.stroke();
-        _super.prototype._lateUpdate.call(this);
     };
     return NLine;
 }(NanObject));
@@ -501,7 +547,6 @@ var Polygon = /** @class */ (function (_super) {
             default:
                 console.error("Unknow render way: %s", this.renderMethod);
         }
-        _super.prototype._lateUpdate.call(this);
     };
     return Polygon;
 }(NanObject));

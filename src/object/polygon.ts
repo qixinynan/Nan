@@ -62,7 +62,6 @@ export default class Polygon extends NanObject{
         break;
       default:
         console.error("Unknow render way: %s", this.renderMethod);  
-    }
-    super._lateUpdate();
+    }    
   }
 }

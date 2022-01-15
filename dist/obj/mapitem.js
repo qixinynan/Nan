@@ -12,13 +12,16 @@ export default class MapItem extends GameObject{
   update() {
     super.update();              
     this.phy.offsetX = Math.sqrt(7500);
-    this.phy.startAngles = Math.PI / 6;
+    this.phy.startAngles = Math.PI / 6;    
 
     if (MapManager.instance.selected == this.name) {        
-      this.phy.lineColor = "yellow"
-      this.phy.color = "red"
+      this.phy.lateUpdate = (obj)=>{
+        // console.log(obj);
+        obj.lineColor = "yellow";        
+        obj.color = "red";
+      }      
     }
-    else {
+    else {      
       this.phy.lineColor = "black";    
       this.phy.color = "green"
     }             

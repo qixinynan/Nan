@@ -33,8 +33,7 @@ export default class Sprite extends NanObject {
       this.transform.position.y,
       this.transform.size.x,
       this.transform.size.y
-    );    
-    super._lateUpdate();
+    );        
   }
 
   /**
