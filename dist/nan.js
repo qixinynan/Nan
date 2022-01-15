@@ -30,12 +30,28 @@ var Nan = /** @class */ (function () {
             Nan.instance = this;
         if (!canvas)
             console.error("Canvas can't be null");
-        this.context = canvas.getContext('2d');
-        canvas.onmouseup = this.clickEvent;
-        canvas.onmousedown = this.mouseDown;
         this.fps = fps;
+        this.context = canvas.getContext('2d');
         this.init();
     }
+    /**
+   * 初始化
+   */
+    Nan.prototype.init = function () {
+        this.registerEvent();
+        setInterval(this.update, 1000 / this.fps);
+    };
+    /**
+     * 事件注册
+     */
+    Nan.prototype.registerEvent = function () {
+        var canvas = Nan.getInstance().context.canvas;
+        canvas.onmouseup = this.clickEvent;
+        canvas.onmousedown = this.mouseDown;
+        canvas.oncontextmenu = function (e) {
+            e.preventDefault();
+        };
+    };
     /**
      * 获取单例
      * @returns 单例
@@ -52,12 +68,6 @@ var Nan = /** @class */ (function () {
      */
     Nan.prototype.getContext = function () {
         return this.context;
-    };
-    /**
-     * 初始化
-     */
-    Nan.prototype.init = function () {
-        setInterval(this.update, 1000 / this.fps);
     };
     /**
      * 每帧刷新
@@ -130,8 +140,11 @@ var Nan = /** @class */ (function () {
         }
         for (var i = 0; i < nan.objList.length; i++) {
             var obj = nan.objList[i];
-            var xOffset = e.x - obj.transform.position.x - obj.colliderStartPos.x + nan.originPosition.x;
-            var yOffset = e.y - obj.transform.position.y - obj.colliderStartPos.y + nan.originPosition.y;
+            var canvasBound = nan.context.canvas.getBoundingClientRect();
+            var x = e.clientX - canvasBound.left;
+            var y = e.clientY - canvasBound.top;
+            var xOffset = x - obj.transform.position.x - obj.colliderStartPos.x + nan.originPosition.x;
+            var yOffset = y - obj.transform.position.y - obj.colliderStartPos.y + nan.originPosition.y;
             if (0 <= xOffset && xOffset <= obj.collider.x && 0 <= yOffset && yOffset <= obj.collider.y) {
                 if (obj.onClick) {
                     obj.onClick();
@@ -149,15 +162,23 @@ var Nan = /** @class */ (function () {
         var lastPos = new Vector(de.clientX, de.clientY);
         nan.isMouseDown = true;
         canvas.onmousemove = function (e) {
-            if (nan.canvasDraggable && nan.isMouseDown) {
-                nan.isDraging = true;
-                var dragX = e.clientX - lastPos.x;
-                var dragY = e.clientY - lastPos.y;
-                console.log(dragX, dragY);
-                if (Math.abs(dragX) > 1 && Math.abs(dragY) > 1) {
+            if (nan.isMouseDown) {
+                if (nan.canvasDraggable && (e.buttons == 2 || e.buttons == 4)) {
+                    nan.isDraging = true;
+                    var canvasBound = nan.context.canvas.getBoundingClientRect();
+                    e.clientX - canvasBound.left;
+                    e.clientY - canvasBound.top;
+                    var dragX = e.clientX - lastPos.x;
+                    var dragY = e.clientY - lastPos.y;
                     nan.translateOrigin(dragX, dragY);
                     lastPos = new Vector(e.clientX, e.clientY);
                 }
+            }
+        };
+        canvas.onmouseout = function () {
+            nan.isMouseDown = false;
+            if (nan.isDraging) {
+                nan.isDraging = false;
             }
         };
     };

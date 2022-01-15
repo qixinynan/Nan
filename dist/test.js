@@ -2,9 +2,11 @@ import {Nan,NText,Transform,Vector,GameObject,NLine, Polygon, Sprite} from './na
 import MapItem from './obj/mapitem.js'
 import MapManager from './manager/mapmanager.js'
 
-let nan = new Nan(document.getElementById('canvas'));    
+let nan = new Nan(document.getElementById('canvas'),60);    
 nan.canvasDraggable = true;
 let mapManager = new MapManager(10,10,new Vector(-150,-150));
 mapManager.init();
+
+
 
 

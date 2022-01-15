@@ -25,14 +25,31 @@ export default class Nan {
       console.error("Nan is already created, You can use getInstance() to get it");          
     else 
       Nan.instance = this;    
-
     if (!canvas)
       console.error("Canvas can't be null")
-    this.context = canvas.getContext('2d') as CanvasRenderingContext2D;        
-    canvas.onmouseup = this.clickEvent;
-    canvas.onmousedown = this.mouseDown;
     this.fps = fps;
+    this.context = canvas.getContext('2d') as CanvasRenderingContext2D;   
     this.init();
+  }
+
+    /**
+   * 初始化
+   */
+  init() {
+    this.registerEvent();
+    setInterval(this.update, 1000/this.fps);
+  }
+
+  /**
+   * 事件注册
+   */
+  private registerEvent() {
+    let canvas: HTMLCanvasElement = Nan.getInstance().context.canvas;         
+    canvas.onmouseup = this.clickEvent;
+    canvas.onmousedown = this.mouseDown;    
+    canvas.oncontextmenu = function(e) {
+      e.preventDefault();
+    }
   }
 
   /**
@@ -52,13 +69,6 @@ export default class Nan {
    */
   getContext(): CanvasRenderingContext2D {
     return this.context;
-  }
-
-  /**
-   * 初始化
-   */
-  init() {
-    setInterval(this.update, 1000/this.fps);
   }
 
   /**
@@ -133,11 +143,14 @@ export default class Nan {
     if(nan.isDraging) { 
       nan.isDraging = false;     
       return;
-    }
+    }        
     for (let i = 0; i < nan.objList.length ; i++) {
       const obj: GameObject = nan.objList[i];
-      let xOffset = e.x - obj.transform.position.x - obj.colliderStartPos.x + nan.originPosition.x;
-      let yOffset = e.y - obj.transform.position.y - obj.colliderStartPos.y + nan.originPosition.y;
+      var canvasBound = nan.context.canvas.getBoundingClientRect()
+      let x = e.clientX - canvasBound.left;
+      let y = e.clientY - canvasBound.top;
+      let xOffset = x - obj.transform.position.x - obj.colliderStartPos.x + nan.originPosition.x;
+      let yOffset = y - obj.transform.position.y - obj.colliderStartPos.y + nan.originPosition.y;
       if (0 <= xOffset && xOffset <= obj.collider.x && 0 <= yOffset && yOffset <= obj.collider.y) {        
         if (obj.onClick) {
           obj.onClick();
@@ -155,18 +168,29 @@ export default class Nan {
     let canvas = nan.getContext().canvas;    
     let lastPos = new Vector(de.clientX, de.clientY);
     nan.isMouseDown = true;
-    canvas.onmousemove = (e: MouseEvent) => {          
-      if (nan.canvasDraggable && nan.isMouseDown) {
-        nan.isDraging = true;
-        let dragX = e.clientX - lastPos.x;
-        let dragY = e.clientY - lastPos.y;
-        console.log(dragX,dragY);
-        if (Math.abs(dragX) > 1 && Math.abs(dragY) > 1) {
+    canvas.onmousemove = (e: MouseEvent) => {                
+      if (nan.isMouseDown) {                
+        if (nan.canvasDraggable && (e.buttons == 2 || e.buttons == 4)) {          
+          nan.isDraging = true;
+
+          var canvasBound = nan.context.canvas.getBoundingClientRect()
+          let x = e.clientX - canvasBound.left;
+          let y = e.clientY - canvasBound.top;        
+
+          let dragX = e.clientX - lastPos.x;
+          let dragY = e.clientY - lastPos.y;
+          
           nan.translateOrigin(dragX, dragY);
-          lastPos = new Vector(e.clientX, e.clientY);
-        }                
+          lastPos = new Vector(e.clientX, e.clientY);        
+        }        
+      }    
+    }  
+    canvas.onmouseout = () => {
+      nan.isMouseDown = false;
+      if(nan.isDraging) { 
+        nan.isDraging = false;             
       }
-    }    
+    }
   }
 
   translateOrigin(x: number, y: number) {

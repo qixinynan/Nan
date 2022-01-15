@@ -4,13 +4,17 @@ import MapItem from '../obj/mapitem.js';
 export default class MapManager {
   heightCount = 0;
   widthCount = 0;
-  startPos = new Vector(0,0)
+  startPos = new Vector(0,0);
+  selected = "";
+  static instance = null;
   
-  constructor(heightCount, widthCount,startPos) {
+  constructor(heightCount, widthCount,startPos) {    
     this.heightCount = heightCount;
     this.widthCount = widthCount;
     this.startPos = startPos;
+    MapManager.instance = this;    
   }
+  
 
   init() {
     let nan = Nan.getInstance();
@@ -21,9 +25,8 @@ export default class MapManager {
         let y = j * 150 + this.startPos.y;
         let obj = new MapItem("MapItem-"+i+"-"+j,new Transform(new Vector(x + offsetX, y))); 
         obj.onClick = ()=> {
-          console.log("我被点击");
-          obj.phy.lineWidth = 10;    
-          obj.phy.color = "red";
+          this.selected = obj.name;
+          document.getElementById("name").textContent = "左侧选择的对象名称：" + this.selected;          
         }
 
         nan.add(obj);   
