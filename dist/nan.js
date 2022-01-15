@@ -1,3 +1,16 @@
+/**
+ * 二维数组
+ */
+var Vector = /** @class */ (function () {
+    function Vector(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    Vector.zero = new Vector(0, 0);
+    Vector.one = new Vector(1, 1);
+    return Vector;
+}());
+
 var Nan = /** @class */ (function () {
     /**
      *  构造函数初始化
@@ -7,6 +20,10 @@ var Nan = /** @class */ (function () {
     function Nan(canvas, fps) {
         if (fps === void 0) { fps = 60; }
         this.objList = []; //已加载的物体列表
+        this.originPosition = new Vector(0, 0);
+        this.canvasDraggable = false; //画布可否拖拽
+        this.isDraging = false;
+        this.isMouseDown = false;
         if (Nan.instance)
             console.error("Nan is already created, You can use getInstance() to get it");
         else
@@ -14,7 +31,8 @@ var Nan = /** @class */ (function () {
         if (!canvas)
             console.error("Canvas can't be null");
         this.context = canvas.getContext('2d');
-        canvas.addEventListener('click', this.clickEvent);
+        canvas.onmouseup = this.clickEvent;
+        canvas.onmousedown = this.mouseDown;
         this.fps = fps;
         this.init();
     }
@@ -46,7 +64,7 @@ var Nan = /** @class */ (function () {
      */
     Nan.prototype.update = function () {
         var nan = Nan.getInstance();
-        nan.context.clearRect(0, 0, nan.context.canvas.width, nan.context.canvas.height); //清屏
+        nan.context.clearRect(nan.originPosition.x, nan.originPosition.y, nan.context.canvas.width, nan.context.canvas.height); //清屏
         for (var i = 0; i < nan.objList.length; i++) {
             var gameObj = nan.objList[i];
             var nanObjList = gameObj.update();
@@ -62,6 +80,9 @@ var Nan = /** @class */ (function () {
         }
         nan.lateUpdate();
     };
+    /**
+     * update执行后执行
+     */
     Nan.prototype.lateUpdate = function () {
         var nan = Nan.getInstance();
         for (var i = 0; i < nan.objList.length; i++) {
@@ -74,7 +95,6 @@ var Nan = /** @class */ (function () {
      * @param obj GameObject对象
      */
     Nan.prototype.add = function (obj) {
-        console.log("Add " + obj.name);
         if (!obj.update()) {
             console.warn("The gameobject named %s hasn't return any NanObject in update()", obj.name);
         }
@@ -98,12 +118,20 @@ var Nan = /** @class */ (function () {
         }
         return result;
     };
+    /**
+     * 点击事件处理
+     */
     Nan.prototype.clickEvent = function (e) {
         var nan = Nan.getInstance();
+        nan.isMouseDown = false;
+        if (nan.isDraging) {
+            nan.isDraging = false;
+            return;
+        }
         for (var i = 0; i < nan.objList.length; i++) {
             var obj = nan.objList[i];
-            var xOffset = e.x - obj.transform.position.x - obj.colliderStartPos.x;
-            var yOffset = e.y - obj.transform.position.y - obj.colliderStartPos.y;
+            var xOffset = e.x - obj.transform.position.x - obj.colliderStartPos.x + nan.originPosition.x;
+            var yOffset = e.y - obj.transform.position.y - obj.colliderStartPos.y + nan.originPosition.y;
             if (0 <= xOffset && xOffset <= obj.collider.x && 0 <= yOffset && yOffset <= obj.collider.y) {
                 if (obj.onClick) {
                     obj.onClick();
@@ -111,20 +139,36 @@ var Nan = /** @class */ (function () {
             }
         }
     };
+    /**
+     * 按下事件处理
+     */
+    //TODO client坐标在canvas坐标变更后可能失效  
+    Nan.prototype.mouseDown = function (de) {
+        var nan = Nan.getInstance();
+        var canvas = nan.getContext().canvas;
+        var lastPos = new Vector(de.clientX, de.clientY);
+        nan.isMouseDown = true;
+        canvas.onmousemove = function (e) {
+            if (nan.canvasDraggable && nan.isMouseDown) {
+                nan.isDraging = true;
+                var dragX = e.clientX - lastPos.x;
+                var dragY = e.clientY - lastPos.y;
+                console.log(dragX, dragY);
+                if (Math.abs(dragX) > 1 && Math.abs(dragY) > 1) {
+                    nan.translateOrigin(dragX, dragY);
+                    lastPos = new Vector(e.clientX, e.clientY);
+                }
+            }
+        };
+    };
+    Nan.prototype.translateOrigin = function (x, y) {
+        this.context.translate(x, y);
+        this.originPosition = new Vector(this.originPosition.x - x, this.originPosition.y - y);
+    };
+    Nan.prototype.moveOrigin = function (x, y) {
+        this.translateOrigin(this.originPosition.x + x, this.originPosition.y + y);
+    };
     return Nan;
-}());
-
-/**
- * 二维数组
- */
-var Vector = /** @class */ (function () {
-    function Vector(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-    Vector.zero = new Vector(0, 0);
-    Vector.one = new Vector(1, 1);
-    return Vector;
 }());
 
 /**

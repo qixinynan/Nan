@@ -1,3 +1,4 @@
+import Vector from 'utils/vector';
 import GameObject from 'object/gameobject';
 import NanObject from 'object/nanobject'
 import Sprite from 'object/sprite'
@@ -8,6 +9,11 @@ export default class Nan {
   private objList: Array<GameObject> = []; //已加载的物体列表
   private static instance:Nan; //单例
   private fps: number; //帧率
+  private originPosition: Vector = new Vector(0, 0);
+  public canvasDraggable: boolean = false; //画布可否拖拽
+
+  private isDraging = false;
+  private isMouseDown = false;
 
   /**
    *  构造函数初始化
@@ -22,8 +28,9 @@ export default class Nan {
 
     if (!canvas)
       console.error("Canvas can't be null")
-    this.context = canvas.getContext('2d') as CanvasRenderingContext2D;    
-    canvas.addEventListener('click',this.clickEvent);
+    this.context = canvas.getContext('2d') as CanvasRenderingContext2D;        
+    canvas.onmouseup = this.clickEvent;
+    canvas.onmousedown = this.mouseDown;
     this.fps = fps;
     this.init();
   }
@@ -59,7 +66,7 @@ export default class Nan {
    */
   update() {
     let nan = Nan.getInstance();
-    nan.context.clearRect(0, 0, nan.context.canvas.width, nan.context.canvas.height); //清屏
+    nan.context.clearRect(nan.originPosition.x, nan.originPosition.y, nan.context.canvas.width, nan.context.canvas.height); //清屏
     for (let i = 0; i < nan.objList.length; i++) {
       let gameObj: GameObject = nan.objList[i];      
       let nanObjList: NanObject[] = gameObj.update() as NanObject[];      
@@ -76,6 +83,9 @@ export default class Nan {
     nan.lateUpdate();
   }
 
+  /**
+   * update执行后执行
+   */
   lateUpdate() {
     let nan = Nan.getInstance();    
     for (let i = 0; i < nan.objList.length; i++) {
@@ -88,8 +98,7 @@ export default class Nan {
    * 添加GameObject对象
    * @param obj GameObject对象
    */
-  add(obj: GameObject) {   
-    console.log("Add " + obj.name); 
+  add(obj: GameObject) {       
     if(!obj.update()) {
       console.warn("The gameobject named %s hasn't return any NanObject in update()",obj.name);
     }   
@@ -115,18 +124,58 @@ export default class Nan {
     return result;
   }
 
+  /**
+   * 点击事件处理   
+   */
   clickEvent(e: MouseEvent) {    
     let nan = Nan.getInstance();
+    nan.isMouseDown = false;
+    if(nan.isDraging) { 
+      nan.isDraging = false;     
+      return;
+    }
     for (let i = 0; i < nan.objList.length ; i++) {
       const obj: GameObject = nan.objList[i];
-      let xOffset = e.x - obj.transform.position.x - obj.colliderStartPos.x;
-      let yOffset = e.y - obj.transform.position.y - obj.colliderStartPos.y;
+      let xOffset = e.x - obj.transform.position.x - obj.colliderStartPos.x + nan.originPosition.x;
+      let yOffset = e.y - obj.transform.position.y - obj.colliderStartPos.y + nan.originPosition.y;
       if (0 <= xOffset && xOffset <= obj.collider.x && 0 <= yOffset && yOffset <= obj.collider.y) {        
         if (obj.onClick) {
           obj.onClick();
         }
       }
-    }
+    }      
   }
+
+  /**
+   * 按下事件处理
+   */
+   //TODO client坐标在canvas坐标变更后可能失效  
+  mouseDown(de: MouseEvent) {
+    let nan = Nan.getInstance();
+    let canvas = nan.getContext().canvas;    
+    let lastPos = new Vector(de.clientX, de.clientY);
+    nan.isMouseDown = true;
+    canvas.onmousemove = (e: MouseEvent) => {          
+      if (nan.canvasDraggable && nan.isMouseDown) {
+        nan.isDraging = true;
+        let dragX = e.clientX - lastPos.x;
+        let dragY = e.clientY - lastPos.y;
+        console.log(dragX,dragY);
+        if (Math.abs(dragX) > 1 && Math.abs(dragY) > 1) {
+          nan.translateOrigin(dragX, dragY);
+          lastPos = new Vector(e.clientX, e.clientY);
+        }                
+      }
+    }    
+  }
+
+  translateOrigin(x: number, y: number) {
+    this.context.translate(x, y);
+    this.originPosition = new Vector(this.originPosition.x - x,this.originPosition.y -y);    
+  }
+
+  moveOrigin(x: number, y: number) {    
+    this.translateOrigin(this.originPosition.x + x, this.originPosition.y + y)
+  }  
 
 }
