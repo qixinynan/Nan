@@ -1,19 +1,21 @@
 import { GameObject, Polygon, Transform, Vector, Utils} from "../nan.js";
 
-export default class MapItem extends GameObject{
-  test = "black";
+export default class MapItem extends GameObject{  
+  phy = new Polygon(new Transform(this.transform.position, null, new Vector(200, 200)), 6, "fill","green");
   constructor(name,transform) {
-    super(name,new Transform(transform.position, null, new Vector(200,200)));
-    this.test = Utils.getRandomColor();
+    super(name,new Transform(transform.position, null, new Vector(Math.sqrt(7500) * 2,200)));    
+    this.collider = new Vector(120,120);    
   }
 
-  update = function update() {                  
-    let phy = new Polygon(new Transform(this.transform.position, null, new Vector(200, 200)), 6, "fill","green");    
-    
-    phy.lineColor = "black";
-    phy.lineWidth = 1;
-    phy.startAngles = Math.PI / 6;      
-    this.showColliderLine(this.test);
-    return [phy];
+  update() {
+    super.update();    
+    this.phy.lineColor = "black";    
+    this.phy.startAngles = Math.PI / 6;     
+    return [this.phy];
+  }
+
+  lateUpdate() {    
+    this.showColliderLine();
+    this.showFrameLine();
   }
 }

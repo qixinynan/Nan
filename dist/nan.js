@@ -60,6 +60,14 @@ var Nan = /** @class */ (function () {
                 }
             }
         }
+        nan.lateUpdate();
+    };
+    Nan.prototype.lateUpdate = function () {
+        var nan = Nan.getInstance();
+        for (var i = 0; i < nan.objList.length; i++) {
+            var gameObj = nan.objList[i];
+            gameObj.lateUpdate();
+        }
     };
     /**
      * 添加GameObject对象
@@ -94,8 +102,8 @@ var Nan = /** @class */ (function () {
         var nan = Nan.getInstance();
         for (var i = 0; i < nan.objList.length; i++) {
             var obj = nan.objList[i];
-            var xOffset = e.x - obj.transform.position.x;
-            var yOffset = e.y - obj.transform.position.y;
+            var xOffset = e.x - obj.transform.position.x - obj.colliderStartPos.x;
+            var yOffset = e.y - obj.transform.position.y - obj.colliderStartPos.y;
             if (0 <= xOffset && xOffset <= obj.collider.x && 0 <= yOffset && yOffset <= obj.collider.y) {
                 if (obj.onClick) {
                     obj.onClick();
@@ -144,6 +152,7 @@ var Transform = /** @class */ (function () {
 var GameObject = /** @class */ (function () {
     function GameObject(name, transform) {
         if (transform === void 0) { transform = new Transform(Vector.zero, Vector.zero, Vector.zero); }
+        this.colliderStartPos = new Vector(0, 0);
         if (!name) {
             console.error("You must create GameObject with param name, Such as new GameObject('Name')");
         }
@@ -160,14 +169,32 @@ var GameObject = /** @class */ (function () {
      * @returns NanObject[]
      */
     GameObject.prototype.update = function () {
+        this.colliderStartPos = new Vector((this.transform.size.x - this.collider.x) / 2, (this.transform.size.y - this.collider.y) / 2);
         return undefined;
+    };
+    GameObject.prototype.lateUpdate = function () {
     };
     GameObject.prototype.showColliderLine = function (color, lineWidth) {
         if (color === void 0) { color = "yellow"; }
         if (lineWidth === void 0) { lineWidth = 1; }
         var context = Nan.getInstance().getContext();
-        var originPos = this.transform.position;
+        var originPos = new Vector(this.transform.position.x + this.colliderStartPos.x, this.transform.position.y + this.colliderStartPos.y);
         var size = this.collider;
+        context.lineWidth = lineWidth;
+        context.moveTo(originPos.x, originPos.y);
+        context.lineTo(originPos.x + size.x, originPos.y);
+        context.lineTo(originPos.x + size.x, originPos.y + size.y);
+        context.lineTo(originPos.x, originPos.y + size.y);
+        context.lineTo(originPos.x, originPos.y);
+        context.strokeStyle = color;
+        context.stroke();
+    };
+    GameObject.prototype.showFrameLine = function (color, lineWidth) {
+        if (color === void 0) { color = "blue"; }
+        if (lineWidth === void 0) { lineWidth = 1; }
+        var context = Nan.getInstance().getContext();
+        var originPos = new Vector(this.transform.position.x, this.transform.position.y);
+        var size = this.transform.size;
         context.lineWidth = lineWidth;
         context.moveTo(originPos.x, originPos.y);
         context.lineTo(originPos.x + size.x, originPos.y);

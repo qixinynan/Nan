@@ -10,7 +10,8 @@ import NanObject from "./nanobject";
 export default class GameObject {
   public name: string;  
   public transform: Transform; //变换信息
-  public collider: Vector;  
+  public collider: Vector; 
+  public colliderStartPos: Vector = new Vector(0,0);
   public onClick: Function | undefined;
 
   constructor(name: string, transform: Transform = new Transform(Vector.zero,Vector.zero,Vector.zero)) {
@@ -19,7 +20,7 @@ export default class GameObject {
     }
     this.name = name;
     this.transform = transform;
-    this.collider = transform.size;
+    this.collider = transform.size;    
     this.init();
   }
   init() {}
@@ -31,13 +32,37 @@ export default class GameObject {
    * @returns NanObject[]
    */
   update(): NanObject[] | undefined {    
-    return undefined;    
+    this.colliderStartPos = new Vector(
+      (this.transform.size.x - this.collider.x) / 2,
+      (this.transform.size.y - this.collider.y) / 2,
+    )        
+    return undefined;
+  }
+
+  lateUpdate() {        
   }
 
   showColliderLine(color:string = "yellow", lineWidth: number = 1) {
+
     let context: CanvasRenderingContext2D = Nan.getInstance().getContext();
-    let originPos: Vector = this.transform.position;
+    let originPos: Vector = new Vector(this.transform.position.x + this.colliderStartPos.x, this.transform.position.y + this.colliderStartPos.y);
     let size: Vector = this.collider;    
+    context.lineWidth = lineWidth;
+
+    context.moveTo(originPos.x, originPos.y);
+    context.lineTo(originPos.x + size.x, originPos.y);
+    context.lineTo(originPos.x + size.x, originPos.y + size.y);
+    context.lineTo(originPos.x, originPos.y + size.y);
+    context.lineTo(originPos.x, originPos.y);    
+    context.strokeStyle = color;    
+    context.stroke();
+  }
+
+  showFrameLine(color:string = "blue", lineWidth: number = 1) {
+
+    let context: CanvasRenderingContext2D = Nan.getInstance().getContext();
+    let originPos: Vector = new Vector(this.transform.position.x, this.transform.position.y);
+    let size: Vector = this.transform.size;
     context.lineWidth = lineWidth;
 
     context.moveTo(originPos.x, originPos.y);

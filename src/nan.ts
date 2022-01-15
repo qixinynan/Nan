@@ -72,6 +72,15 @@ export default class Nan {
           nanObj._update();          
         }
       } 
+    }
+    nan.lateUpdate();
+  }
+
+  lateUpdate() {
+    let nan = Nan.getInstance();    
+    for (let i = 0; i < nan.objList.length; i++) {
+      let gameObj: GameObject = nan.objList[i];      
+      gameObj.lateUpdate();
     }    
   }
 
@@ -110,8 +119,8 @@ export default class Nan {
     let nan = Nan.getInstance();
     for (let i = 0; i < nan.objList.length ; i++) {
       const obj: GameObject = nan.objList[i];
-      let xOffset = e.x -obj.transform.position.x;
-      let yOffset = e.y -obj.transform.position.y;
+      let xOffset = e.x - obj.transform.position.x - obj.colliderStartPos.x;
+      let yOffset = e.y - obj.transform.position.y - obj.colliderStartPos.y;
       if (0 <= xOffset && xOffset <= obj.collider.x && 0 <= yOffset && yOffset <= obj.collider.y) {        
         if (obj.onClick) {
           obj.onClick();
