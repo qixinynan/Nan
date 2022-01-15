@@ -407,6 +407,8 @@ var Polygon = /** @class */ (function (_super) {
         _this.renderMethod = renderMethod;
         _this.color = color;
         _this.lineColor = color;
+        _this.offsetX = _this.transform.size.x / 2;
+        _this.offsetY = _this.transform.size.x / 2;
         return _this;
     }
     Polygon.prototype._update = function () {
@@ -415,8 +417,8 @@ var Polygon = /** @class */ (function (_super) {
         this.context.beginPath();
         var ang = 2 * Math.PI / this.angles;
         for (var i = 0; i < this.angles; i++) {
-            var x = Math.cos(ang * i + this.startAngles) * this.transform.size.x / 2 + this.transform.position.x + this.transform.size.x / 2;
-            var y = Math.sin(ang * i + this.startAngles) * this.transform.size.y / 2 + this.transform.position.y + this.transform.size.x / 2;
+            var x = Math.cos(ang * i + this.startAngles) * this.transform.size.x / 2 + this.transform.position.x + this.offsetX;
+            var y = Math.sin(ang * i + this.startAngles) * this.transform.size.y / 2 + this.transform.position.y + this.offsetY;
             this.context.lineTo(x, y);
         }
         this.context.closePath();

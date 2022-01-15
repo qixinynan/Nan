@@ -9,7 +9,8 @@ export default class MapItem extends GameObject{
 
   update() {
     super.update();    
-    this.phy.lineColor = "black";    
+    this.phy.lineColor = "black";
+    this.phy.offsetX = Math.sqrt(7500);    
     this.phy.startAngles = Math.PI / 6;     
     return [this.phy];
   }

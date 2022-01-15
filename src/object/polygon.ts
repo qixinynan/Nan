@@ -1,3 +1,4 @@
+import { Vector } from "index";
 import Transform from "utils/transform";
 import NanObject from "./nanobject";
 
@@ -14,6 +15,9 @@ export default class Polygon extends NanObject{
   // 描边像素
   public lineWidth: number = 1;
 
+  public offsetX: number;
+  public offsetY: number;
+
   /**
    * 多边形
    * @param transform 变换信息
@@ -27,6 +31,8 @@ export default class Polygon extends NanObject{
     this.renderMethod = renderMethod;
     this.color = color;    
     this.lineColor = color;
+    this.offsetX = this.transform.size.x / 2;
+    this.offsetY = this.transform.size.x / 2;
   }
 
   _update(): void {
@@ -36,8 +42,8 @@ export default class Polygon extends NanObject{
     let ang: number = 2 * Math.PI / this.angles;
 
     for (let i = 0; i < this.angles ; i++) {
-      let x:number = Math.cos(ang * i + this.startAngles) * this.transform.size.x / 2 + this.transform.position.x + this.transform.size.x / 2;
-      let y:number = Math.sin(ang * i + this.startAngles) * this.transform.size.y / 2 + this.transform.position.y + this.transform.size.x / 2;                  
+      let x:number = Math.cos(ang * i + this.startAngles) * this.transform.size.x / 2 + this.transform.position.x + this.offsetX;
+      let y:number = Math.sin(ang * i + this.startAngles) * this.transform.size.y / 2 + this.transform.position.y + this.offsetY;                  
       this.context.lineTo(x,y);            
     }
 
