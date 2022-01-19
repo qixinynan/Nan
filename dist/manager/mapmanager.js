@@ -6,6 +6,7 @@ export default class MapManager {
   widthCount = 0;
   startPos = new Vector(0,0);
   selected = "";
+  bc = 20;
   static instance = null;
 
   constructor(heightCount, widthCount,startPos) {
@@ -20,10 +21,10 @@ export default class MapManager {
     let nan = Nan.getInstance();
     for (let i = 0; i < this.widthCount; i++) {
       for (let j = 0; j < this.heightCount; j++) {
-        let offsetX = j % 2 == 0 ? 0 : Math.sqrt(7500);
-        let x = i * Math.sqrt(7500) * 2 + this.startPos.x;
-        let y = j * 150 + this.startPos.y;
-        let obj = new MapItem("MapItem-"+i+"-"+j,new Transform(new Vector(x + offsetX, y)));
+        let offsetX = j % 2 == 0 ? 0 : Math.sqrt(this.bc*this.bc*3);
+        let x = i * Math.sqrt(this.bc*this.bc*3) * 2 + this.startPos.x;
+        let y = j * this.bc*3 + this.startPos.y;
+        let obj = new MapItem("MapItem-"+i+"-"+j,new Transform(new Vector(x + offsetX, y)), this.bc);
         obj.onClick = ()=> {
           this.selected = obj.name;
           document.getElementById("name").textContent = "左侧选择的对象名称：" + this.selected;

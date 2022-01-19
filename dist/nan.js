@@ -23,6 +23,7 @@ var Nan = /** @class */ (function () {
         this.originPosition = new Vector(0, 0);
         this.originScale = new Vector(1, 1);
         this.canvasDraggable = false; //画布可否拖拽
+        this.canvasScalable = false; //FIXME 放大后不停拖拽移动位置后再缩小会有严重渲染错误  
         this.extraCleanRect = new Vector(0, 0); //额外擦除区域
         this.isDraging = false;
         this.isMouseDown = false;
