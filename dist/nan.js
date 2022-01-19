@@ -20,13 +20,16 @@ var Nan = /** @class */ (function () {
     function Nan(canvas, fps) {
         if (fps === void 0) { fps = 60; }
         this.objList = []; //已加载的物体列表
+        this.objMap = new Map(); //已加载的物体列表
         this.originPosition = new Vector(0, 0);
         this.originScale = new Vector(1, 1);
         this.canvasDraggable = false; //画布可否拖拽
-        this.canvasScalable = false; //FIXME 放大后不停拖拽移动位置后再缩小会有严重渲染错误  
+        this.canvasScalable = false; //FIXME 放大后不停拖拽移动位置后再缩小会有严重渲染错误
         this.extraCleanRect = new Vector(0, 0); //额外擦除区域
         this.isDraging = false;
         this.isMouseDown = false;
+        this.bc = 20;
+        this.itemMap = new Map(); //已加载的物体列表
         if (Nan.instance)
             console.error("Nan is already created, You can use getInstance() to get it");
         else
@@ -37,6 +40,13 @@ var Nan = /** @class */ (function () {
         this.context = canvas.getContext('2d');
         this.init();
     }
+    Nan.prototype.setBc = function (bc) {
+        this.bc = bc;
+        console.log(this.bc);
+    };
+    Nan.prototype.getBc = function () {
+        return this.bc;
+    };
     /**
    * 初始化
    */
@@ -80,7 +90,7 @@ var Nan = /** @class */ (function () {
         var nan = Nan.getInstance();
         var allNanObjList = [];
         var cleanX = nan.originPosition.x, cleanY = nan.originPosition.y, canvasWidth = nan.context.canvas.width, canvasHeight = nan.context.canvas.height;
-        nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x + nan.extraCleanRect.x, canvasHeight / nan.originScale.y + nan.extraCleanRect.y); //清屏        
+        nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x + nan.extraCleanRect.x, canvasHeight / nan.originScale.y + nan.extraCleanRect.y); //清屏
         for (var i = 0; i < nan.objList.length; i++) {
             var gameObj = nan.objList[i];
             var nanObjList = gameObj.update();
@@ -99,7 +109,7 @@ var Nan = /** @class */ (function () {
             allNanObjList[i]._lateUpdate();
         }
         nan.lateUpdate();
-        nan.context.rect(cleanX, cleanY, canvasWidth / nan.originScale.x + nan.extraCleanRect.x, canvasHeight / nan.originScale.y + nan.extraCleanRect.y); //清屏        
+        nan.context.rect(cleanX, cleanY, canvasWidth / nan.originScale.x + nan.extraCleanRect.x, canvasHeight / nan.originScale.y + nan.extraCleanRect.y); //清屏
         nan.context.stroke();
     };
     /**
@@ -121,6 +131,7 @@ var Nan = /** @class */ (function () {
             console.warn("The gameobject named %s hasn't return any NanObject in update()", obj.name);
         }
         this.objList.push(obj);
+        this.objMap.set(obj.name, obj);
     };
     /**
      * 查询Nan对象
@@ -140,10 +151,37 @@ var Nan = /** @class */ (function () {
         }
         return result;
     };
+    Nan.prototype.findGameObject1 = function (name) {
+        var result = null;
+        result = this.objMap.get(name);
+        if (!result) {
+            console.error("Can't find object by name: %s", name);
+        }
+        return result;
+    };
     /**
      * 点击事件处理
      */
     Nan.prototype.clickEvent = function (e) {
+        var nan = Nan.getInstance();
+        nan.isMouseDown = false;
+        if (nan.isDraging) {
+            nan.isDraging = false;
+            return;
+        }
+        var canvasBound = nan.context.canvas.getBoundingClientRect();
+        var x = e.clientX - canvasBound.left;
+        var y = e.clientY - canvasBound.top;
+        var i = Math.floor((y - nan.bc) / nan.bc / 2);
+        var j = Math.floor(x / Math.sqrt(3) / 2 / nan.bc);
+        // console.log(nan.itemMap)
+        console.log(i, j, x, y, nan.bc);
+        obj = nan.itemMap.get([i, j]);
+        if (obj) {
+            obj.onClick();
+        }
+    };
+    Nan.prototype.clickEvent1 = function (e) {
         var nan = Nan.getInstance();
         nan.isMouseDown = false;
         if (nan.isDraging) {
@@ -167,7 +205,7 @@ var Nan = /** @class */ (function () {
     /**
      * 按下事件处理
      */
-    //TODO client坐标在canvas坐标变更后可能失效  
+    //TODO client坐标在canvas坐标变更后可能失效
     Nan.prototype.mouseDown = function (de) {
         var nan = Nan.getInstance();
         var canvas = nan.getContext().canvas;
@@ -229,16 +267,17 @@ var Nan = /** @class */ (function () {
      * @param x x
      * @param y x
      */
-    //TODO 以中心缩放   
+    //TODO 以中心缩放
     Nan.prototype.scaleOrigin = function (x, y) {
         // context.translate((_left + _width/2) - (_width / 2) * scale, (_top + _height/2)  - (_height / 2) * scale);
         this.context.canvas.width;
         this.context.canvas.height;
-        // this.translateOrigin(cWidth / 4, cHeight / 4)    
-        // this.translateOrigin((cWidth + this.originPosition.x)/2,(cHeight + this.originPosition.y))    
+        this.bc = this.bc * x;
+        // this.translateOrigin(cWidth / 4, cHeight / 4)
+        // this.translateOrigin((cWidth + this.originPosition.x)/2,(cHeight + this.originPosition.y))
         this.context.scale(x, y);
         this.originScale = new Vector(this.originScale.x * x, this.originScale.y * y);
-        console.log(this.originScale);
+        console.log(this.originScale, this.bc);
     };
     return Nan;
 }());
