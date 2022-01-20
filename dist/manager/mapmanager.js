@@ -27,7 +27,8 @@ export default class MapManager {
         let x = i * Math.sqrt(this.bc*this.bc*3) * 2 + this.startPos.x;
         let y = j * this.bc*3 + this.startPos.y;
         let obj = new MapItem("MapItem-"+i+"-"+j,new Transform(new Vector(x + offsetX, y)), this.bc);
-        nan.itemMap.set([i,j], obj);
+        nan.itemMap[[i,j]] = obj;
+        // console.log(nan.itemMap[[i, j]], nan.itemMap.get([i,j]))
         obj.onClick = ()=> {
           this.selected = obj.name;
           document.getElementById("name").textContent = "左侧选择的对象名称：" + this.selected;

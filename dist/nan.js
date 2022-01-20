@@ -172,12 +172,15 @@ var Nan = /** @class */ (function () {
         var canvasBound = nan.context.canvas.getBoundingClientRect();
         var x = e.clientX - canvasBound.left;
         var y = e.clientY - canvasBound.top;
-        var i = Math.floor((y - nan.bc) / nan.bc / 2);
-        var j = Math.floor(x / Math.sqrt(3) / 2 / nan.bc);
-        // console.log(nan.itemMap)
-        console.log(i, j, x, y, nan.bc);
-        obj = nan.itemMap.get([i, j]);
-        if (obj) {
+        var j = Math.floor(y / 3 / nan.bc);
+        var offsetX = j % 2 == 0 ? 0 : Math.sqrt(nan.bc * nan.bc * 3);
+        var i = (x - offsetX) / 2;
+        i = Math.floor(i / Math.sqrt(nan.bc * nan.bc * 3));
+        var key = [i, j];
+        console.log(key, x, y, nan.bc);
+        var obj = nan.itemMap[key];
+        // console.log(key, nan.itemMap.has(key), obj, nan.itemMap)
+        if (obj && obj.onClick) {
             obj.onClick();
         }
     };

@@ -172,7 +172,7 @@ export default class Nan {
   /**
    * 点击事件处理
    */
-  clickEvent1(e: MouseEvent) {
+  clickEvent(e: MouseEvent) {
     let nan = Nan.getInstance();
     nan.isMouseDown = false;
     if(nan.isDraging) {
@@ -182,17 +182,20 @@ export default class Nan {
     var canvasBound = nan.context.canvas.getBoundingClientRect()
     let x = e.clientX - canvasBound.left;
     let y = e.clientY - canvasBound.top;
-    let i = Math.floor((y-nan.bc)/nan.bc/2);
-    let j = Math.floor(x/Math.sqrt(3)/2/nan.bc);
-    // console.log(nan.itemMap)
-    console.log(i, j, x, y, nan.bc);
-    obj = nan.itemMap.get([i,j]);
-    if(obj){
+    let j = Math.floor(y/3/nan.bc);
+    let offsetX = j % 2 == 0 ? 0 : Math.sqrt(nan.bc*nan.bc*3);
+    let i = (x-offsetX)/2;
+    i = Math.floor(i/Math.sqrt(nan.bc*nan.bc*3));
+    let key = [i,j]
+    console.log(key, x, y, nan.bc);
+    let obj = nan.itemMap[key];
+    // console.log(key, nan.itemMap.has(key), obj, nan.itemMap)
+    if(obj && obj.onClick){
         obj.onClick();
     }
   }
 
-  clickEvent(e: MouseEvent) {
+  clickEvent1(e: MouseEvent) {
     let nan = Nan.getInstance();
     nan.isMouseDown = false;
     if(nan.isDraging) {
