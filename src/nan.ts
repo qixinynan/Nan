@@ -12,15 +12,15 @@ export default class Nan {
   private fps: number; //帧率
   private originPosition: Vector = new Vector(0, 0);
   private originScale: Vector = new Vector(1, 1);
-  public canvasDraggable: boolean = false; //画布可否拖拽
+  public canvasDraggable: boolean = true; //画布可否拖拽
   public canvasScalable: boolean = false; //FIXME 放大后不停拖拽移动位置后再缩小会有严重渲染错误
   public extraCleanRect:Vector =  new Vector(0,0); //额外擦除区域
 
   private isDraging = false;
   private isMouseDown = false;
-  public bc = 20;
+  public bc = 20; //多边形单位长度
   public itemMap = new Map(); //已加载的物体列表
-
+  public scale=1;
   /**
    *  构造函数初始化
    * @param canvas Canvas对象
@@ -96,6 +96,8 @@ export default class Nan {
         cleanY = nan.originPosition.y,
         canvasWidth = nan.context.canvas.width,
         canvasHeight = nan.context.canvas.height;
+
+    console.log(cleanX, cleanY, canvasWidth, canvasHeight);
     nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏
     for (let i = 0; i < nan.objList.length; i++) {
       let gameObj: GameObject = nan.objList[i];
@@ -139,7 +141,7 @@ export default class Nan {
       console.warn("The gameobject named %s hasn't return any NanObject in update()",obj.name);
     }
     this.objList.push(obj);
-    this.objMap.set(obj.name, obj);
+    this.objMap[obj.name] = obj;
   }
 
   /**
@@ -163,7 +165,7 @@ export default class Nan {
 
   findGameObject1(name: string): GameObject | null {
     let result:GameObject | null = null;
-    result = this.objMap.get(name);
+    result = this.objMap[name];
     if (!result) {
       console.error("Can't find object by name: %s", name);
     }
@@ -187,7 +189,7 @@ export default class Nan {
     let i = (x-offsetX)/2;
     i = Math.floor(i/Math.sqrt(nan.bc*nan.bc*3));
     let key = [i,j]
-    console.log(key, x, y, nan.bc);
+    // console.log(key, x, y, nan.bc);
     let obj = nan.itemMap[key];
     // console.log(key, nan.itemMap.has(key), obj, nan.itemMap)
     if(obj && obj.onClick){
@@ -227,6 +229,7 @@ export default class Nan {
     nan.isMouseDown = true;
     canvas.onmousemove = (e: MouseEvent) => {
       if (nan.isMouseDown) {
+        // console.log(nan.canvasDraggable, e.buttons);
         if (nan.canvasDraggable && (e.buttons == 2 || e.buttons == 4)) {
           nan.isDraging = true;
 
@@ -292,15 +295,20 @@ export default class Nan {
    */
   //TODO 以中心缩放
   scaleOrigin(x: number, y: number) {
+    if(this.scale<0.1 && x<1) return;
+    if(this.scale>10 && x>1) return;
     // context.translate((_left + _width/2) - (_width / 2) * scale, (_top + _height/2)  - (_height / 2) * scale);
     let cWidth = this.context.canvas.width;
     let cHeight = this.context.canvas.height;
     this.bc = this.bc * x;
     // this.translateOrigin(cWidth / 4, cHeight / 4)
     // this.translateOrigin((cWidth + this.originPosition.x)/2,(cHeight + this.originPosition.y))
+    this.scale *= x;
+    // origin.x = x - (x - origin.x) * scaleBy;
+    // origin.y = y - (y - origin.y) * scaleBy;
     this.context.scale(x, y);
     this.originScale = new Vector(this.originScale.x * x, this.originScale.y * y)
-    console.log(this.originScale, this.bc);;
+    // console.log(this.originScale, this.bc);;
   }
 
 }

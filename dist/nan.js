@@ -23,13 +23,14 @@ var Nan = /** @class */ (function () {
         this.objMap = new Map(); //已加载的物体列表
         this.originPosition = new Vector(0, 0);
         this.originScale = new Vector(1, 1);
-        this.canvasDraggable = false; //画布可否拖拽
+        this.canvasDraggable = true; //画布可否拖拽
         this.canvasScalable = false; //FIXME 放大后不停拖拽移动位置后再缩小会有严重渲染错误
         this.extraCleanRect = new Vector(0, 0); //额外擦除区域
         this.isDraging = false;
         this.isMouseDown = false;
-        this.bc = 20;
+        this.bc = 20; //多边形单位长度
         this.itemMap = new Map(); //已加载的物体列表
+        this.scale = 1;
         if (Nan.instance)
             console.error("Nan is already created, You can use getInstance() to get it");
         else
@@ -90,6 +91,7 @@ var Nan = /** @class */ (function () {
         var nan = Nan.getInstance();
         var allNanObjList = [];
         var cleanX = nan.originPosition.x, cleanY = nan.originPosition.y, canvasWidth = nan.context.canvas.width, canvasHeight = nan.context.canvas.height;
+        console.log(cleanX, cleanY, canvasWidth, canvasHeight);
         nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x + nan.extraCleanRect.x, canvasHeight / nan.originScale.y + nan.extraCleanRect.y); //清屏
         for (var i = 0; i < nan.objList.length; i++) {
             var gameObj = nan.objList[i];
@@ -131,7 +133,7 @@ var Nan = /** @class */ (function () {
             console.warn("The gameobject named %s hasn't return any NanObject in update()", obj.name);
         }
         this.objList.push(obj);
-        this.objMap.set(obj.name, obj);
+        this.objMap[obj.name] = obj;
     };
     /**
      * 查询Nan对象
@@ -153,7 +155,7 @@ var Nan = /** @class */ (function () {
     };
     Nan.prototype.findGameObject1 = function (name) {
         var result = null;
-        result = this.objMap.get(name);
+        result = this.objMap[name];
         if (!result) {
             console.error("Can't find object by name: %s", name);
         }
@@ -177,7 +179,7 @@ var Nan = /** @class */ (function () {
         var i = (x - offsetX) / 2;
         i = Math.floor(i / Math.sqrt(nan.bc * nan.bc * 3));
         var key = [i, j];
-        console.log(key, x, y, nan.bc);
+        // console.log(key, x, y, nan.bc);
         var obj = nan.itemMap[key];
         // console.log(key, nan.itemMap.has(key), obj, nan.itemMap)
         if (obj && obj.onClick) {
@@ -216,6 +218,7 @@ var Nan = /** @class */ (function () {
         nan.isMouseDown = true;
         canvas.onmousemove = function (e) {
             if (nan.isMouseDown) {
+                // console.log(nan.canvasDraggable, e.buttons);
                 if (nan.canvasDraggable && (e.buttons == 2 || e.buttons == 4)) {
                     nan.isDraging = true;
                     var canvasBound = nan.context.canvas.getBoundingClientRect();
@@ -272,15 +275,22 @@ var Nan = /** @class */ (function () {
      */
     //TODO 以中心缩放
     Nan.prototype.scaleOrigin = function (x, y) {
+        if (this.scale < 0.1 && x < 1)
+            return;
+        if (this.scale > 10 && x > 1)
+            return;
         // context.translate((_left + _width/2) - (_width / 2) * scale, (_top + _height/2)  - (_height / 2) * scale);
         this.context.canvas.width;
         this.context.canvas.height;
         this.bc = this.bc * x;
         // this.translateOrigin(cWidth / 4, cHeight / 4)
         // this.translateOrigin((cWidth + this.originPosition.x)/2,(cHeight + this.originPosition.y))
+        this.scale *= x;
+        // origin.x = x - (x - origin.x) * scaleBy;
+        // origin.y = y - (y - origin.y) * scaleBy;
         this.context.scale(x, y);
         this.originScale = new Vector(this.originScale.x * x, this.originScale.y * y);
-        console.log(this.originScale, this.bc);
+        // console.log(this.originScale, this.bc);;
     };
     return Nan;
 }());
