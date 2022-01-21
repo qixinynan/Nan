@@ -24,7 +24,7 @@ var Nan = /** @class */ (function () {
         this.originPosition = new Vector(0, 0);
         this.originScale = new Vector(1, 1);
         this.canvasDraggable = true; //画布可否拖拽
-        this.canvasScalable = false; //FIXME 放大后不停拖拽移动位置后再缩小会有严重渲染错误
+        this.canvasScalable = true; //FIXME 放大后不停拖拽移动位置后再缩小会有严重渲染错误
         this.extraCleanRect = new Vector(0, 0); //额外擦除区域
         this.isDraging = false;
         this.isMouseDown = false;
@@ -84,15 +84,28 @@ var Nan = /** @class */ (function () {
     Nan.prototype.getContext = function () {
         return this.context;
     };
+    // 清屏
+    Nan.prototype.clear = function () {
+        var nan = Nan.getInstance();
+        // let allNanObjList: NanObject[] = [];
+        var cleanX = nan.originPosition.x, cleanY = nan.originPosition.y, canvasWidth = nan.context.canvas.width, canvasHeight = nan.context.canvas.height;
+        console.log(cleanX, cleanY, canvasWidth, canvasHeight);
+        nan.context.clearRect(cleanX - 10, cleanY - 10, canvasWidth / nan.originScale.x + nan.extraCleanRect.x, canvasHeight / nan.originScale.y + nan.extraCleanRect.y); //清屏
+    };
     /**
      * 每帧刷新
      */
     Nan.prototype.update = function () {
         var nan = Nan.getInstance();
         var allNanObjList = [];
-        var cleanX = nan.originPosition.x, cleanY = nan.originPosition.y, canvasWidth = nan.context.canvas.width, canvasHeight = nan.context.canvas.height;
-        console.log(cleanX, cleanY, canvasWidth, canvasHeight);
-        nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x + nan.extraCleanRect.x, canvasHeight / nan.originScale.y + nan.extraCleanRect.y); //清屏
+        // let cleanX = nan.originPosition.x,
+        //     cleanY = nan.originPosition.y,
+        //     canvasWidth = nan.context.canvas.width,
+        //     canvasHeight = nan.context.canvas.height;
+        // console.log(cleanX, cleanY, canvasWidth, canvasHeight);
+        // nan.context.clearRect(cleanX-10, cleanY-10, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏
+        // nan.context.clearRect(-100, -100, 2000, 2000); //清屏
+        nan.clear();
         for (var i = 0; i < nan.objList.length; i++) {
             var gameObj = nan.objList[i];
             var nanObjList = gameObj.update();
@@ -111,7 +124,7 @@ var Nan = /** @class */ (function () {
             allNanObjList[i]._lateUpdate();
         }
         nan.lateUpdate();
-        nan.context.rect(cleanX, cleanY, canvasWidth / nan.originScale.x + nan.extraCleanRect.x, canvasHeight / nan.originScale.y + nan.extraCleanRect.y); //清屏
+        // nan.context.rect(cleanX, cleanY, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏
         nan.context.stroke();
     };
     /**
@@ -279,6 +292,7 @@ var Nan = /** @class */ (function () {
             return;
         if (this.scale > 10 && x > 1)
             return;
+        this.clear();
         // context.translate((_left + _width/2) - (_width / 2) * scale, (_top + _height/2)  - (_height / 2) * scale);
         this.context.canvas.width;
         this.context.canvas.height;
@@ -291,6 +305,7 @@ var Nan = /** @class */ (function () {
         this.context.scale(x, y);
         this.originScale = new Vector(this.originScale.x * x, this.originScale.y * y);
         // console.log(this.originScale, this.bc);;
+        this.clear();
     };
     return Nan;
 }());

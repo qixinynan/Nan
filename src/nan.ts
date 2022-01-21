@@ -13,7 +13,7 @@ export default class Nan {
   private originPosition: Vector = new Vector(0, 0);
   private originScale: Vector = new Vector(1, 1);
   public canvasDraggable: boolean = true; //画布可否拖拽
-  public canvasScalable: boolean = false; //FIXME 放大后不停拖拽移动位置后再缩小会有严重渲染错误
+  public canvasScalable: boolean = true; //FIXME 放大后不停拖拽移动位置后再缩小会有严重渲染错误
   public extraCleanRect:Vector =  new Vector(0,0); //额外擦除区域
 
   private isDraging = false;
@@ -86,19 +86,35 @@ export default class Nan {
     return this.context;
   }
 
-  /**
-   * 每帧刷新
-   */
-  update() {
+  // 清屏
+  clear(){
     let nan = Nan.getInstance();
-    let allNanObjList: NanObject[] = [];
+    // let allNanObjList: NanObject[] = [];
     let cleanX = nan.originPosition.x,
         cleanY = nan.originPosition.y,
         canvasWidth = nan.context.canvas.width,
         canvasHeight = nan.context.canvas.height;
 
     console.log(cleanX, cleanY, canvasWidth, canvasHeight);
-    nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏
+    nan.context.clearRect(cleanX-10, cleanY-10, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏
+  }
+
+  /**
+   * 每帧刷新
+   */
+  update() {
+    let nan = Nan.getInstance();
+    let allNanObjList: NanObject[] = [];
+    // let cleanX = nan.originPosition.x,
+    //     cleanY = nan.originPosition.y,
+    //     canvasWidth = nan.context.canvas.width,
+    //     canvasHeight = nan.context.canvas.height;
+
+    // console.log(cleanX, cleanY, canvasWidth, canvasHeight);
+    // nan.context.clearRect(cleanX-10, cleanY-10, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏
+    // nan.context.clearRect(-100, -100, 2000, 2000); //清屏
+    nan.clear();
+
     for (let i = 0; i < nan.objList.length; i++) {
       let gameObj: GameObject = nan.objList[i];
       let nanObjList: NanObject[] = gameObj.update() as NanObject[];
@@ -117,7 +133,7 @@ export default class Nan {
       allNanObjList[i]._lateUpdate();
     }
     nan.lateUpdate();
-    nan.context.rect(cleanX, cleanY, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏
+    // nan.context.rect(cleanX, cleanY, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏
     nan.context.stroke();
   }
 
@@ -297,6 +313,7 @@ export default class Nan {
   scaleOrigin(x: number, y: number) {
     if(this.scale<0.1 && x<1) return;
     if(this.scale>10 && x>1) return;
+    this.clear();
     // context.translate((_left + _width/2) - (_width / 2) * scale, (_top + _height/2)  - (_height / 2) * scale);
     let cWidth = this.context.canvas.width;
     let cHeight = this.context.canvas.height;
@@ -309,6 +326,7 @@ export default class Nan {
     this.context.scale(x, y);
     this.originScale = new Vector(this.originScale.x * x, this.originScale.y * y)
     // console.log(this.originScale, this.bc);;
+    this.clear();
   }
 
 }
