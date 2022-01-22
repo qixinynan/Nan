@@ -96,15 +96,18 @@ var EventMouse = /** @class */ (function (_super) {
         var canvas = nan.getContext().canvas;
         var lastPos = new Vector(de.clientX, de.clientY);
         this.isMouseDown = true;
+        // console.log(de.clientX, de.clientY);
         canvas.onmousemove = function (e) {
             if (_this.isMouseDown) {
-                if (nan.canvasDraggable && (e.buttons == 2 || e.buttons == 4)) {
+                if (nan.canvasDraggable && (e.buttons == 2 || e.buttons == 1)) {
                     _this.isDraging = true;
                     var canvasBound = nan.context.canvas.getBoundingClientRect();
                     e.clientX - canvasBound.left;
                     e.clientY - canvasBound.top;
                     var dragX = e.clientX - lastPos.x;
                     var dragY = e.clientY - lastPos.y;
+                    dragX /= nan.scale;
+                    dragY /= nan.scale;
                     nan.translateOrigin(dragX, dragY);
                     lastPos = new Vector(e.clientX, e.clientY);
                 }
@@ -153,7 +156,7 @@ var Nan = /** @class */ (function () {
         this.eventManager = new EventManager();
         this.originPosition = new Vector(0, 0);
         this.originScale = new Vector(1, 1);
-        this.objList = []; //已加载的物体列表  
+        this.objList = []; //已加载的物体列表
         this.canvasDraggable = true; //画布可否拖拽
         this.canvasScalable = true; //FIXME 缩放后清除可能依旧有问题
         this.extraCleanRect = new Vector(0, 0); //额外擦除区域
@@ -195,7 +198,7 @@ var Nan = /** @class */ (function () {
     // 清屏
     Nan.prototype.clear = function () {
         var nan = Nan.getInstance();
-        var cleanX = nan.originPosition.x, cleanY = nan.originPosition.y, canvasWidth = nan.context.canvas.width, canvasHeight = nan.context.canvas.height;
+        var cleanX = nan.originPosition.x / nan.scale, cleanY = nan.originPosition.y / nan.scale, canvasWidth = nan.context.canvas.width, canvasHeight = nan.context.canvas.height;
         // console.log(cleanX, cleanY, canvasWidth, canvasHeight);
         nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x + nan.extraCleanRect.x, canvasHeight / nan.originScale.y + nan.extraCleanRect.y); //清屏
     };
@@ -270,7 +273,8 @@ var Nan = /** @class */ (function () {
      */
     Nan.prototype.translateOrigin = function (x, y) {
         this.context.translate(x, y);
-        this.originPosition = new Vector(this.originPosition.x - x, this.originPosition.y - y);
+        this.originPosition = new Vector(this.originPosition.x - x * this.scale, this.originPosition.y - y * this.scale);
+        // console.log(x,y, this.originPosition.x, this.originPosition.y);
     };
     /**
      * 移动“到”坐标原点并记录
@@ -289,7 +293,7 @@ var Nan = /** @class */ (function () {
     Nan.prototype.scaleOrigin = function (x) {
         if (this.scale < 0.1 && x < 1)
             return;
-        if (this.scale > 10 && x > 1)
+        if (this.scale > 3 && x > 1)
             return;
         this.scale *= x;
         this.context.scale(x, x);

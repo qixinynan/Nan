@@ -5,15 +5,15 @@ import Sprite from 'object/sprite'
 import EventManager from 'event/eventmanager';
 
 export default class Nan {
-  
+
   private static instance:Nan; //单例
-  private fps: number; //帧率    
+  private fps: number; //帧率
   private eventManager: EventManager = new EventManager();
 
   public originPosition: Vector = new Vector(0, 0);
   public originScale: Vector = new Vector(1, 1);
-  public context: CanvasRenderingContext2D; //Canvas渲染器  
-  public objList: Array<GameObject> = []; //已加载的物体列表  
+  public context: CanvasRenderingContext2D; //Canvas渲染器
+  public objList: Array<GameObject> = []; //已加载的物体列表
   public canvasDraggable: boolean = true; //画布可否拖拽
   public canvasScalable: boolean = true; //FIXME 缩放后清除可能依旧有问题
   public extraCleanRect:Vector =  new Vector(0,0); //额外擦除区域
@@ -64,9 +64,9 @@ export default class Nan {
 
   // 清屏
   clear(){
-    let nan = Nan.getInstance();    
-    let cleanX = nan.originPosition.x,
-        cleanY = nan.originPosition.y,
+    let nan = Nan.getInstance();
+    let cleanX = nan.originPosition.x/nan.scale,
+        cleanY = nan.originPosition.y/nan.scale,
         canvasWidth = nan.context.canvas.width,
         canvasHeight = nan.context.canvas.height;
     // console.log(cleanX, cleanY, canvasWidth, canvasHeight);
@@ -78,7 +78,7 @@ export default class Nan {
    */
   update() {
     let nan = Nan.getInstance();
-    let allNanObjList: NanObject[] = [];    
+    let allNanObjList: NanObject[] = [];
     nan.clear();
 
     for (let i = 0; i < nan.objList.length; i++) {
@@ -98,7 +98,7 @@ export default class Nan {
     for (let i = 0; i < allNanObjList.length; i++) {
       allNanObjList[i]._lateUpdate();
     }
-    nan.lateUpdate();    
+    nan.lateUpdate();
   }
 
   /**
@@ -120,7 +120,7 @@ export default class Nan {
     if(!obj.update()) {
       console.warn("The gameobject named %s hasn't return any NanObject in update()",obj.name);
     }
-    this.objList.push(obj);    
+    this.objList.push(obj);
   }
 
   /**
@@ -141,7 +141,7 @@ export default class Nan {
     }
     return result;
   }
-  
+
   /**
    * 移动坐标原点并记录
    * @param x x
@@ -149,7 +149,8 @@ export default class Nan {
    */
   translateOrigin(x: number, y: number) {
     this.context.translate(x, y);
-    this.originPosition = new Vector(this.originPosition.x - x,this.originPosition.y -y);
+    this.originPosition = new Vector(this.originPosition.x - x*this.scale,this.originPosition.y - y*this.scale);
+    // console.log(x,y, this.originPosition.x, this.originPosition.y);
   }
 
   /**
@@ -169,9 +170,9 @@ export default class Nan {
   //TODO 以中心缩放
   scaleOrigin(x: number) {
     if(this.scale<0.1 && x<1) return;
-    if(this.scale>10 && x>1) return;                
-    this.scale *= x;    
+    if(this.scale>3 && x>1) return;
+    this.scale *= x;
     this.context.scale(x, x);
-    this.originScale = new Vector(this.originScale.x * x, this.originScale.y * x)        
+    this.originScale = new Vector(this.originScale.x * x, this.originScale.y * x)
   }
 }
