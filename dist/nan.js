@@ -11,6 +11,137 @@ var Vector = /** @class */ (function () {
     return Vector;
 }());
 
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise */
+
+var extendStatics = function(d, b) {
+    extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+    return extendStatics(d, b);
+};
+
+function __extends(d, b) {
+    if (typeof b !== "function" && b !== null)
+        throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+    extendStatics(d, b);
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
+
+var NanEvent = /** @class */ (function () {
+    function NanEvent() {
+        this.nan = Nan$1.getInstance();
+    }
+    return NanEvent;
+}());
+
+var EventMouse = /** @class */ (function (_super) {
+    __extends(EventMouse, _super);
+    function EventMouse() {
+        var _this = _super.call(this) || this;
+        //TODO EventMouse使用了太多Nan的参数，耦合太高了
+        _this.isDraging = false;
+        _this.isMouseDown = false;
+        var canvas = _this.nan.getContext().canvas;
+        canvas.onmouseup = _this.onClick;
+        canvas.onmousedown = _this.onMouseDown;
+        canvas.onwheel = _this.onWheel;
+        canvas.oncontextmenu = function (e) {
+            e.preventDefault();
+        };
+        return _this;
+    }
+    EventMouse.prototype.onClick = function (e) {
+        var nan = Nan$1.getInstance();
+        this.isMouseDown = false;
+        if (this.isDraging) {
+            this.isDraging = false;
+            return;
+        }
+        for (var i = 0; i < nan.objList.length; i++) {
+            var obj = nan.objList[i];
+            var canvasBound = nan.context.canvas.getBoundingClientRect();
+            var x = e.clientX - canvasBound.left;
+            var y = e.clientY - canvasBound.top;
+            var xOffset = x - obj.transform.position.x - obj.colliderStartPos.x + nan.originPosition.x;
+            var yOffset = y - obj.transform.position.y - obj.colliderStartPos.y + nan.originPosition.y;
+            if (0 <= xOffset && xOffset <= obj.collider.x && 0 <= yOffset && yOffset <= obj.collider.y) {
+                if (obj.onClick) {
+                    obj.onClick();
+                }
+            }
+        }
+    };
+    /**
+     * 按下事件处理
+     */
+    //TODO client坐标在canvas坐标变更后可能失效
+    EventMouse.prototype.onMouseDown = function (de) {
+        var _this = this;
+        var nan = Nan$1.getInstance();
+        var canvas = nan.getContext().canvas;
+        var lastPos = new Vector(de.clientX, de.clientY);
+        this.isMouseDown = true;
+        canvas.onmousemove = function (e) {
+            if (_this.isMouseDown) {
+                if (nan.canvasDraggable && (e.buttons == 2 || e.buttons == 4)) {
+                    _this.isDraging = true;
+                    var canvasBound = nan.context.canvas.getBoundingClientRect();
+                    e.clientX - canvasBound.left;
+                    e.clientY - canvasBound.top;
+                    var dragX = e.clientX - lastPos.x;
+                    var dragY = e.clientY - lastPos.y;
+                    nan.translateOrigin(dragX, dragY);
+                    lastPos = new Vector(e.clientX, e.clientY);
+                }
+            }
+        };
+        canvas.onmouseout = function () {
+            _this.isMouseDown = false;
+            if (_this.isDraging) {
+                _this.isDraging = false;
+            }
+        };
+    };
+    /**
+     * 监听滚轮事件
+     * 缩放功能
+     */
+    EventMouse.prototype.onWheel = function (e) {
+        var nan = Nan$1.getInstance();
+        if (e.deltaY > 0) {
+            nan.scaleOrigin(0.8);
+        }
+        else {
+            nan.scaleOrigin(1.2);
+        }
+    };
+    return EventMouse;
+}(NanEvent));
+
+var EventManager = /** @class */ (function () {
+    function EventManager() {
+    }
+    EventManager.prototype.init = function () {
+        new EventMouse();
+    };
+    return EventManager;
+}());
+
 var Nan = /** @class */ (function () {
     /**
      *  构造函数初始化
@@ -19,14 +150,13 @@ var Nan = /** @class */ (function () {
      */
     function Nan(canvas, fps) {
         if (fps === void 0) { fps = 60; }
-        this.objList = []; //已加载的物体列表  
+        this.eventManager = new EventManager();
         this.originPosition = new Vector(0, 0);
         this.originScale = new Vector(1, 1);
+        this.objList = []; //已加载的物体列表  
         this.canvasDraggable = true; //画布可否拖拽
         this.canvasScalable = true; //FIXME 缩放后清除可能依旧有问题
         this.extraCleanRect = new Vector(0, 0); //额外擦除区域
-        this.isDraging = false;
-        this.isMouseDown = false;
         this.scale = 1;
         if (Nan.instance)
             console.error("Nan is already created, You can use getInstance() to get it");
@@ -42,20 +172,8 @@ var Nan = /** @class */ (function () {
    * 初始化
    */
     Nan.prototype.init = function () {
-        this.registerEvent();
+        this.eventManager.init();
         setInterval(this.update, 1000 / this.fps);
-    };
-    /**
-     * 事件注册
-     */
-    Nan.prototype.registerEvent = function () {
-        var canvas = Nan.getInstance().context.canvas;
-        canvas.onmouseup = this.clickEvent;
-        canvas.onmousedown = this.mouseDown;
-        canvas.onwheel = this.onWheel;
-        canvas.oncontextmenu = function (e) {
-            e.preventDefault();
-        };
     };
     /**
      * 获取单例
@@ -145,71 +263,6 @@ var Nan = /** @class */ (function () {
         }
         return result;
     };
-    Nan.prototype.clickEvent = function (e) {
-        var nan = Nan.getInstance();
-        nan.isMouseDown = false;
-        if (nan.isDraging) {
-            nan.isDraging = false;
-            return;
-        }
-        for (var i = 0; i < nan.objList.length; i++) {
-            var obj = nan.objList[i];
-            var canvasBound = nan.context.canvas.getBoundingClientRect();
-            var x = e.clientX - canvasBound.left;
-            var y = e.clientY - canvasBound.top;
-            var xOffset = x - obj.transform.position.x - obj.colliderStartPos.x + nan.originPosition.x;
-            var yOffset = y - obj.transform.position.y - obj.colliderStartPos.y + nan.originPosition.y;
-            if (0 <= xOffset && xOffset <= obj.collider.x && 0 <= yOffset && yOffset <= obj.collider.y) {
-                if (obj.onClick) {
-                    obj.onClick();
-                }
-            }
-        }
-    };
-    /**
-     * 按下事件处理
-     */
-    //TODO client坐标在canvas坐标变更后可能失效
-    Nan.prototype.mouseDown = function (de) {
-        var nan = Nan.getInstance();
-        var canvas = nan.getContext().canvas;
-        var lastPos = new Vector(de.clientX, de.clientY);
-        nan.isMouseDown = true;
-        canvas.onmousemove = function (e) {
-            if (nan.isMouseDown) {
-                if (nan.canvasDraggable && (e.buttons == 2 || e.buttons == 4)) {
-                    nan.isDraging = true;
-                    var canvasBound = nan.context.canvas.getBoundingClientRect();
-                    e.clientX - canvasBound.left;
-                    e.clientY - canvasBound.top;
-                    var dragX = e.clientX - lastPos.x;
-                    var dragY = e.clientY - lastPos.y;
-                    nan.translateOrigin(dragX, dragY);
-                    lastPos = new Vector(e.clientX, e.clientY);
-                }
-            }
-        };
-        canvas.onmouseout = function () {
-            nan.isMouseDown = false;
-            if (nan.isDraging) {
-                nan.isDraging = false;
-            }
-        };
-    };
-    /**
-     * 监听滚轮事件
-     * 缩放功能
-     */
-    Nan.prototype.onWheel = function (e) {
-        var nan = Nan.getInstance();
-        debugger;
-        if (e.deltaY > 0) {
-            nan.scaleOrigin(0.8);
-        }
-        else {
-            nan.scaleOrigin(1.2);
-        }
-    };
     /**
      * 移动坐标原点并记录
      * @param x x
@@ -244,6 +297,7 @@ var Nan = /** @class */ (function () {
     };
     return Nan;
 }());
+var Nan$1 = Nan;
 
 /**
  * 变换信息
@@ -295,7 +349,7 @@ var GameObject = /** @class */ (function () {
     GameObject.prototype.showColliderLine = function (color, lineWidth) {
         if (color === void 0) { color = "yellow"; }
         if (lineWidth === void 0) { lineWidth = 1; }
-        var context = Nan.getInstance().getContext();
+        var context = Nan$1.getInstance().getContext();
         var originPos = new Vector(this.transform.position.x + this.colliderStartPos.x, this.transform.position.y + this.colliderStartPos.y);
         var size = this.collider;
         context.lineWidth = lineWidth;
@@ -310,7 +364,7 @@ var GameObject = /** @class */ (function () {
     GameObject.prototype.showFrameLine = function (color, lineWidth) {
         if (color === void 0) { color = "blue"; }
         if (lineWidth === void 0) { lineWidth = 1; }
-        var context = Nan.getInstance().getContext();
+        var context = Nan$1.getInstance().getContext();
         var originPos = new Vector(this.transform.position.x, this.transform.position.y);
         var size = this.transform.size;
         context.lineWidth = lineWidth;
@@ -335,7 +389,7 @@ var NanObject = /** @class */ (function () {
      */
     function NanObject(transform) {
         this.transform = transform;
-        this.context = Nan.getInstance().getContext();
+        this.context = Nan$1.getInstance().getContext();
     }
     /**
      * 如果Init方法已被赋值，则执行Init方法
@@ -376,37 +430,6 @@ var NanObject = /** @class */ (function () {
     };
     return NanObject;
 }());
-
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation.
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
-***************************************************************************** */
-/* global Reflect, Promise */
-
-var extendStatics = function(d, b) {
-    extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-    return extendStatics(d, b);
-};
-
-function __extends(d, b) {
-    if (typeof b !== "function" && b !== null)
-        throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-    extendStatics(d, b);
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-}
 
 /**
  * Sprite类
@@ -569,4 +592,4 @@ var Utils = /** @class */ (function () {
     return Utils;
 }());
 
-export { GameObject, NLine, NText, Nan, NanObject, Polygon, Sprite, Transform, Utils, Vector };
+export { GameObject, NLine, NText, Nan$1 as Nan, NanObject, Polygon, Sprite, Transform, Utils, Vector };

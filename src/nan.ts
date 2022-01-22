@@ -2,21 +2,21 @@ import Vector from 'utils/vector';
 import GameObject from 'object/gameobject';
 import NanObject from 'object/nanobject'
 import Sprite from 'object/sprite'
+import EventManager from 'event/eventmanager';
 
 export default class Nan {
-
-  private context: CanvasRenderingContext2D; //Canvas渲染器
-  private objList: Array<GameObject> = []; //已加载的物体列表  
+  
   private static instance:Nan; //单例
-  private fps: number; //帧率
-  private originPosition: Vector = new Vector(0, 0);
-  private originScale: Vector = new Vector(1, 1);
+  private fps: number; //帧率    
+  private eventManager: EventManager = new EventManager();
+
+  public originPosition: Vector = new Vector(0, 0);
+  public originScale: Vector = new Vector(1, 1);
+  public context: CanvasRenderingContext2D; //Canvas渲染器  
+  public objList: Array<GameObject> = []; //已加载的物体列表  
   public canvasDraggable: boolean = true; //画布可否拖拽
   public canvasScalable: boolean = true; //FIXME 缩放后清除可能依旧有问题
   public extraCleanRect:Vector =  new Vector(0,0); //额外擦除区域
-
-  private isDraging = false;
-  private isMouseDown = false;  
   public scale=1;
   /**
    *  构造函数初始化
@@ -39,21 +39,8 @@ export default class Nan {
    * 初始化
    */
   init() {
-    this.registerEvent();
+    this.eventManager.init();
     setInterval(this.update, 1000/this.fps);
-  }
-
-  /**
-   * 事件注册
-   */
-  private registerEvent() {
-    let canvas: HTMLCanvasElement = Nan.getInstance().context.canvas;
-    canvas.onmouseup = this.clickEvent;
-    canvas.onmousedown = this.mouseDown;
-    canvas.onwheel = this.onWheel;
-    canvas.oncontextmenu = function(e) {
-      e.preventDefault();
-    }
   }
 
   /**
@@ -155,75 +142,6 @@ export default class Nan {
     return result;
   }
   
-
-
-  clickEvent(e: MouseEvent) {
-    let nan = Nan.getInstance();
-    nan.isMouseDown = false;
-    if(nan.isDraging) {
-      nan.isDraging = false;
-      return;
-    }
-    for (let i = 0; i < nan.objList.length ; i++) {
-      const obj: GameObject = nan.objList[i];
-      var canvasBound = nan.context.canvas.getBoundingClientRect()
-      let x = e.clientX - canvasBound.left;
-      let y = e.clientY - canvasBound.top;
-      let xOffset = x - obj.transform.position.x - obj.colliderStartPos.x + nan.originPosition.x;
-      let yOffset = y - obj.transform.position.y - obj.colliderStartPos.y + nan.originPosition.y;
-      if (0 <= xOffset && xOffset <= obj.collider.x && 0 <= yOffset && yOffset <= obj.collider.y) {
-        if (obj.onClick) {
-          obj.onClick();
-        }
-      }
-    }
-  }
-  /**
-   * 按下事件处理
-   */
-   //TODO client坐标在canvas坐标变更后可能失效
-  mouseDown(de: MouseEvent) {
-    let nan = Nan.getInstance();
-    let canvas = nan.getContext().canvas;
-    let lastPos = new Vector(de.clientX, de.clientY);
-    nan.isMouseDown = true;
-    canvas.onmousemove = (e: MouseEvent) => {
-      if (nan.isMouseDown) {        
-        if (nan.canvasDraggable && (e.buttons == 2 || e.buttons == 4)) {
-          nan.isDraging = true;
-          var canvasBound = nan.context.canvas.getBoundingClientRect()
-          let x = e.clientX - canvasBound.left;
-          let y = e.clientY - canvasBound.top;
-          let dragX = e.clientX - lastPos.x;
-          let dragY = e.clientY - lastPos.y;
-          nan.translateOrigin(dragX, dragY);
-          lastPos = new Vector(e.clientX, e.clientY);
-        }
-      }
-    }
-    canvas.onmouseout = () => {
-      nan.isMouseDown = false;
-      if(nan.isDraging) {
-        nan.isDraging = false;
-      }
-    }
-  }
-
-  /**
-   * 监听滚轮事件
-   * 缩放功能
-   */
-  onWheel(e: WheelEvent) {
-    let nan = Nan.getInstance();
-    debugger;
-    if (e.deltaY > 0) {
-      nan.scaleOrigin(0.8);      
-    }
-    else {
-      nan.scaleOrigin(1.2);
-    }
-  }
-
   /**
    * 移动坐标原点并记录
    * @param x x
