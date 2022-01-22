@@ -6,8 +6,7 @@ import Sprite from 'object/sprite'
 export default class Nan {
 
   private context: CanvasRenderingContext2D; //Canvas渲染器
-  private objList: Array<GameObject> = []; //已加载的物体列表
-  private objMap = new Map(); //已加载的物体列表
+  private objList: Array<GameObject> = []; //已加载的物体列表  
   private static instance:Nan; //单例
   private fps: number; //帧率
   private originPosition: Vector = new Vector(0, 0);
@@ -17,9 +16,7 @@ export default class Nan {
   public extraCleanRect:Vector =  new Vector(0,0); //额外擦除区域
 
   private isDraging = false;
-  private isMouseDown = false;
-  public bc = 20; //多边形单位长度
-  public itemMap = new Map(); //已加载的物体列表
+  private isMouseDown = false;  
   public scale=1;
   /**
    *  构造函数初始化
@@ -38,14 +35,6 @@ export default class Nan {
     this.init();
   }
 
-  setBc(bc: number) {
-    this.bc = bc;
-    console.log(this.bc);
-  }
-
-  getBc() {
-    return this.bc;
-  }
     /**
    * 初始化
    */
@@ -88,15 +77,13 @@ export default class Nan {
 
   // 清屏
   clear(){
-    let nan = Nan.getInstance();
-    // let allNanObjList: NanObject[] = [];
+    let nan = Nan.getInstance();    
     let cleanX = nan.originPosition.x,
         cleanY = nan.originPosition.y,
         canvasWidth = nan.context.canvas.width,
         canvasHeight = nan.context.canvas.height;
-
     console.log(cleanX, cleanY, canvasWidth, canvasHeight);
-    nan.context.clearRect(cleanX-10, cleanY-10, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏
+    nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏
   }
 
   /**
@@ -104,15 +91,7 @@ export default class Nan {
    */
   update() {
     let nan = Nan.getInstance();
-    let allNanObjList: NanObject[] = [];
-    // let cleanX = nan.originPosition.x,
-    //     cleanY = nan.originPosition.y,
-    //     canvasWidth = nan.context.canvas.width,
-    //     canvasHeight = nan.context.canvas.height;
-
-    // console.log(cleanX, cleanY, canvasWidth, canvasHeight);
-    // nan.context.clearRect(cleanX-10, cleanY-10, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏
-    // nan.context.clearRect(-100, -100, 2000, 2000); //清屏
+    let allNanObjList: NanObject[] = [];    
     nan.clear();
 
     for (let i = 0; i < nan.objList.length; i++) {
@@ -132,9 +111,7 @@ export default class Nan {
     for (let i = 0; i < allNanObjList.length; i++) {
       allNanObjList[i]._lateUpdate();
     }
-    nan.lateUpdate();
-    // nan.context.rect(cleanX, cleanY, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏
-    nan.context.stroke();
+    nan.lateUpdate();    
   }
 
   /**
@@ -156,8 +133,7 @@ export default class Nan {
     if(!obj.update()) {
       console.warn("The gameobject named %s hasn't return any NanObject in update()",obj.name);
     }
-    this.objList.push(obj);
-    this.objMap[obj.name] = obj;
+    this.objList.push(obj);    
   }
 
   /**
@@ -178,42 +154,10 @@ export default class Nan {
     }
     return result;
   }
+  
 
-  findGameObject1(name: string): GameObject | null {
-    let result:GameObject | null = null;
-    result = this.objMap[name];
-    if (!result) {
-      console.error("Can't find object by name: %s", name);
-    }
-    return result;
-  }
-  /**
-   * 点击事件处理
-   */
+
   clickEvent(e: MouseEvent) {
-    let nan = Nan.getInstance();
-    nan.isMouseDown = false;
-    if(nan.isDraging) {
-      nan.isDraging = false;
-      return;
-    }
-    var canvasBound = nan.context.canvas.getBoundingClientRect()
-    let x = e.clientX - canvasBound.left;
-    let y = e.clientY - canvasBound.top;
-    let j = Math.floor(y/3/nan.bc);
-    let offsetX = j % 2 == 0 ? 0 : Math.sqrt(nan.bc*nan.bc*3);
-    let i = (x-offsetX)/2;
-    i = Math.floor(i/Math.sqrt(nan.bc*nan.bc*3));
-    let key = [i,j]
-    // console.log(key, x, y, nan.bc);
-    let obj = nan.itemMap[key];
-    // console.log(key, nan.itemMap.has(key), obj, nan.itemMap)
-    if(obj && obj.onClick){
-        obj.onClick();
-    }
-  }
-
-  clickEvent1(e: MouseEvent) {
     let nan = Nan.getInstance();
     nan.isMouseDown = false;
     if(nan.isDraging) {
@@ -244,18 +188,14 @@ export default class Nan {
     let lastPos = new Vector(de.clientX, de.clientY);
     nan.isMouseDown = true;
     canvas.onmousemove = (e: MouseEvent) => {
-      if (nan.isMouseDown) {
-        // console.log(nan.canvasDraggable, e.buttons);
+      if (nan.isMouseDown) {        
         if (nan.canvasDraggable && (e.buttons == 2 || e.buttons == 4)) {
           nan.isDraging = true;
-
           var canvasBound = nan.context.canvas.getBoundingClientRect()
           let x = e.clientX - canvasBound.left;
           let y = e.clientY - canvasBound.top;
-
           let dragX = e.clientX - lastPos.x;
           let dragY = e.clientY - lastPos.y;
-
           nan.translateOrigin(dragX, dragY);
           lastPos = new Vector(e.clientX, e.clientY);
         }
@@ -278,10 +218,10 @@ export default class Nan {
     let nan = Nan.getInstance();
 
     if (e.deltaY > 0) {
-      nan.scaleOrigin(0.8,0.8)
+      nan.scaleOrigin(0.8);      
     }
     else {
-      nan.scaleOrigin(1.2,1.2)
+      nan.scaleOrigin(1.2);
     }
   }
 
@@ -310,23 +250,12 @@ export default class Nan {
    * @param y x
    */
   //TODO 以中心缩放
-  scaleOrigin(x: number, y: number) {
+  scaleOrigin(x: number) {
     if(this.scale<0.1 && x<1) return;
-    if(this.scale>10 && x>1) return;
-    this.clear();
-    // context.translate((_left + _width/2) - (_width / 2) * scale, (_top + _height/2)  - (_height / 2) * scale);
-    let cWidth = this.context.canvas.width;
-    let cHeight = this.context.canvas.height;
-    this.bc = this.bc * x;
-    // this.translateOrigin(cWidth / 4, cHeight / 4)
-    // this.translateOrigin((cWidth + this.originPosition.x)/2,(cHeight + this.originPosition.y))
-    this.scale *= x;
-    // origin.x = x - (x - origin.x) * scaleBy;
-    // origin.y = y - (y - origin.y) * scaleBy;
-    this.context.scale(x, y);
-    this.originScale = new Vector(this.originScale.x * x, this.originScale.y * y)
-    // console.log(this.originScale, this.bc);;
+    if(this.scale>10 && x>1) return;                
+    this.scale *= x;    
+    this.context.scale(x, x);
+    this.originScale = new Vector(this.originScale.x * x, this.originScale.y * x)    
     this.clear();
   }
-
 }

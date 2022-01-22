@@ -19,8 +19,7 @@ var Nan = /** @class */ (function () {
      */
     function Nan(canvas, fps) {
         if (fps === void 0) { fps = 60; }
-        this.objList = []; //已加载的物体列表
-        this.objMap = new Map(); //已加载的物体列表
+        this.objList = []; //已加载的物体列表  
         this.originPosition = new Vector(0, 0);
         this.originScale = new Vector(1, 1);
         this.canvasDraggable = true; //画布可否拖拽
@@ -28,8 +27,6 @@ var Nan = /** @class */ (function () {
         this.extraCleanRect = new Vector(0, 0); //额外擦除区域
         this.isDraging = false;
         this.isMouseDown = false;
-        this.bc = 20; //多边形单位长度
-        this.itemMap = new Map(); //已加载的物体列表
         this.scale = 1;
         if (Nan.instance)
             console.error("Nan is already created, You can use getInstance() to get it");
@@ -41,13 +38,6 @@ var Nan = /** @class */ (function () {
         this.context = canvas.getContext('2d');
         this.init();
     }
-    Nan.prototype.setBc = function (bc) {
-        this.bc = bc;
-        console.log(this.bc);
-    };
-    Nan.prototype.getBc = function () {
-        return this.bc;
-    };
     /**
    * 初始化
    */
@@ -87,10 +77,9 @@ var Nan = /** @class */ (function () {
     // 清屏
     Nan.prototype.clear = function () {
         var nan = Nan.getInstance();
-        // let allNanObjList: NanObject[] = [];
         var cleanX = nan.originPosition.x, cleanY = nan.originPosition.y, canvasWidth = nan.context.canvas.width, canvasHeight = nan.context.canvas.height;
         console.log(cleanX, cleanY, canvasWidth, canvasHeight);
-        nan.context.clearRect(cleanX - 10, cleanY - 10, canvasWidth / nan.originScale.x + nan.extraCleanRect.x, canvasHeight / nan.originScale.y + nan.extraCleanRect.y); //清屏
+        nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x + nan.extraCleanRect.x, canvasHeight / nan.originScale.y + nan.extraCleanRect.y); //清屏
     };
     /**
      * 每帧刷新
@@ -98,13 +87,6 @@ var Nan = /** @class */ (function () {
     Nan.prototype.update = function () {
         var nan = Nan.getInstance();
         var allNanObjList = [];
-        // let cleanX = nan.originPosition.x,
-        //     cleanY = nan.originPosition.y,
-        //     canvasWidth = nan.context.canvas.width,
-        //     canvasHeight = nan.context.canvas.height;
-        // console.log(cleanX, cleanY, canvasWidth, canvasHeight);
-        // nan.context.clearRect(cleanX-10, cleanY-10, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏
-        // nan.context.clearRect(-100, -100, 2000, 2000); //清屏
         nan.clear();
         for (var i = 0; i < nan.objList.length; i++) {
             var gameObj = nan.objList[i];
@@ -124,8 +106,6 @@ var Nan = /** @class */ (function () {
             allNanObjList[i]._lateUpdate();
         }
         nan.lateUpdate();
-        // nan.context.rect(cleanX, cleanY, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏
-        nan.context.stroke();
     };
     /**
      * update执行后执行
@@ -146,7 +126,6 @@ var Nan = /** @class */ (function () {
             console.warn("The gameobject named %s hasn't return any NanObject in update()", obj.name);
         }
         this.objList.push(obj);
-        this.objMap[obj.name] = obj;
     };
     /**
      * 查询Nan对象
@@ -166,40 +145,7 @@ var Nan = /** @class */ (function () {
         }
         return result;
     };
-    Nan.prototype.findGameObject1 = function (name) {
-        var result = null;
-        result = this.objMap[name];
-        if (!result) {
-            console.error("Can't find object by name: %s", name);
-        }
-        return result;
-    };
-    /**
-     * 点击事件处理
-     */
     Nan.prototype.clickEvent = function (e) {
-        var nan = Nan.getInstance();
-        nan.isMouseDown = false;
-        if (nan.isDraging) {
-            nan.isDraging = false;
-            return;
-        }
-        var canvasBound = nan.context.canvas.getBoundingClientRect();
-        var x = e.clientX - canvasBound.left;
-        var y = e.clientY - canvasBound.top;
-        var j = Math.floor(y / 3 / nan.bc);
-        var offsetX = j % 2 == 0 ? 0 : Math.sqrt(nan.bc * nan.bc * 3);
-        var i = (x - offsetX) / 2;
-        i = Math.floor(i / Math.sqrt(nan.bc * nan.bc * 3));
-        var key = [i, j];
-        // console.log(key, x, y, nan.bc);
-        var obj = nan.itemMap[key];
-        // console.log(key, nan.itemMap.has(key), obj, nan.itemMap)
-        if (obj && obj.onClick) {
-            obj.onClick();
-        }
-    };
-    Nan.prototype.clickEvent1 = function (e) {
         var nan = Nan.getInstance();
         nan.isMouseDown = false;
         if (nan.isDraging) {
@@ -231,7 +177,6 @@ var Nan = /** @class */ (function () {
         nan.isMouseDown = true;
         canvas.onmousemove = function (e) {
             if (nan.isMouseDown) {
-                // console.log(nan.canvasDraggable, e.buttons);
                 if (nan.canvasDraggable && (e.buttons == 2 || e.buttons == 4)) {
                     nan.isDraging = true;
                     var canvasBound = nan.context.canvas.getBoundingClientRect();
@@ -258,10 +203,10 @@ var Nan = /** @class */ (function () {
     Nan.prototype.onWheel = function (e) {
         var nan = Nan.getInstance();
         if (e.deltaY > 0) {
-            nan.scaleOrigin(0.8, 0.8);
+            nan.scaleOrigin(0.8);
         }
         else {
-            nan.scaleOrigin(1.2, 1.2);
+            nan.scaleOrigin(1.2);
         }
     };
     /**
@@ -287,24 +232,14 @@ var Nan = /** @class */ (function () {
      * @param y x
      */
     //TODO 以中心缩放
-    Nan.prototype.scaleOrigin = function (x, y) {
+    Nan.prototype.scaleOrigin = function (x) {
         if (this.scale < 0.1 && x < 1)
             return;
         if (this.scale > 10 && x > 1)
             return;
-        this.clear();
-        // context.translate((_left + _width/2) - (_width / 2) * scale, (_top + _height/2)  - (_height / 2) * scale);
-        this.context.canvas.width;
-        this.context.canvas.height;
-        this.bc = this.bc * x;
-        // this.translateOrigin(cWidth / 4, cHeight / 4)
-        // this.translateOrigin((cWidth + this.originPosition.x)/2,(cHeight + this.originPosition.y))
         this.scale *= x;
-        // origin.x = x - (x - origin.x) * scaleBy;
-        // origin.y = y - (y - origin.y) * scaleBy;
-        this.context.scale(x, y);
-        this.originScale = new Vector(this.originScale.x * x, this.originScale.y * y);
-        // console.log(this.originScale, this.bc);;
+        this.context.scale(x, x);
+        this.originScale = new Vector(this.originScale.x * x, this.originScale.y * x);
         this.clear();
     };
     return Nan;
