@@ -12,7 +12,7 @@ export default class Nan {
   private originPosition: Vector = new Vector(0, 0);
   private originScale: Vector = new Vector(1, 1);
   public canvasDraggable: boolean = true; //画布可否拖拽
-  public canvasScalable: boolean = true; //FIXME 放大后不停拖拽移动位置后再缩小会有严重渲染错误
+  public canvasScalable: boolean = true; //FIXME 缩放后清除可能依旧有问题
   public extraCleanRect:Vector =  new Vector(0,0); //额外擦除区域
 
   private isDraging = false;
@@ -82,7 +82,7 @@ export default class Nan {
         cleanY = nan.originPosition.y,
         canvasWidth = nan.context.canvas.width,
         canvasHeight = nan.context.canvas.height;
-    console.log(cleanX, cleanY, canvasWidth, canvasHeight);
+    // console.log(cleanX, cleanY, canvasWidth, canvasHeight);
     nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏
   }
 
@@ -214,9 +214,8 @@ export default class Nan {
    * 缩放功能
    */
   onWheel(e: WheelEvent) {
-
     let nan = Nan.getInstance();
-
+    debugger;
     if (e.deltaY > 0) {
       nan.scaleOrigin(0.8);      
     }
@@ -255,7 +254,6 @@ export default class Nan {
     if(this.scale>10 && x>1) return;                
     this.scale *= x;    
     this.context.scale(x, x);
-    this.originScale = new Vector(this.originScale.x * x, this.originScale.y * x)    
-    this.clear();
+    this.originScale = new Vector(this.originScale.x * x, this.originScale.y * x)        
   }
 }

@@ -23,7 +23,7 @@ var Nan = /** @class */ (function () {
         this.originPosition = new Vector(0, 0);
         this.originScale = new Vector(1, 1);
         this.canvasDraggable = true; //画布可否拖拽
-        this.canvasScalable = true; //FIXME 放大后不停拖拽移动位置后再缩小会有严重渲染错误
+        this.canvasScalable = true; //FIXME 缩放后清除可能依旧有问题
         this.extraCleanRect = new Vector(0, 0); //额外擦除区域
         this.isDraging = false;
         this.isMouseDown = false;
@@ -78,7 +78,7 @@ var Nan = /** @class */ (function () {
     Nan.prototype.clear = function () {
         var nan = Nan.getInstance();
         var cleanX = nan.originPosition.x, cleanY = nan.originPosition.y, canvasWidth = nan.context.canvas.width, canvasHeight = nan.context.canvas.height;
-        console.log(cleanX, cleanY, canvasWidth, canvasHeight);
+        // console.log(cleanX, cleanY, canvasWidth, canvasHeight);
         nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x + nan.extraCleanRect.x, canvasHeight / nan.originScale.y + nan.extraCleanRect.y); //清屏
     };
     /**
@@ -202,6 +202,7 @@ var Nan = /** @class */ (function () {
      */
     Nan.prototype.onWheel = function (e) {
         var nan = Nan.getInstance();
+        debugger;
         if (e.deltaY > 0) {
             nan.scaleOrigin(0.8);
         }
@@ -240,7 +241,6 @@ var Nan = /** @class */ (function () {
         this.scale *= x;
         this.context.scale(x, x);
         this.originScale = new Vector(this.originScale.x * x, this.originScale.y * x);
-        this.clear();
     };
     return Nan;
 }());
