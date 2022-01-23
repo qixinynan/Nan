@@ -1,8 +1,8 @@
-import Vector from 'utils/vector';
-import GameObject from 'object/gameobject';
-import NanObject from 'object/nanobject'
-import Sprite from 'object/sprite'
-import EventManager from 'event/eventmanager';
+import Vector from './utils/vector';
+import GameObject from './object/gameobject';
+import NanObject from './object/nanobject'
+import Sprite from './object/sprite'
+import EventManager from './event/eventmanager';
 
 export default class Nan {
 

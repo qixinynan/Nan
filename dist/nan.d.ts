@@ -1,5 +1,5 @@
-import Vector from 'utils/vector';
-import GameObject from 'object/gameobject';
+import Vector from './utils/vector';
+import GameObject from './object/gameobject';
 export default class Nan {
     private static instance;
     private fps;
