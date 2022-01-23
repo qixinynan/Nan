@@ -1,5 +1,6 @@
 {
   "compilerOptions": {      
+    "declaration": true,
     "watch": true,    
     "module": "es6",                                /* Specify what module code is generated. */
     "rootDir": "./src",                                  /* Specify the root folder within your source files. */    
