@@ -158,8 +158,7 @@ var Nan = /** @class */ (function () {
         this.originScale = new Vector(1, 1);
         this.objList = []; //已加载的物体列表
         this.canvasDraggable = true; //画布可否拖拽
-        this.canvasScalable = true; //FIXME 缩放后清除可能依旧有问题
-        this.extraCleanRect = new Vector(0, 0); //额外擦除区域
+        this.canvasScalable = true; //FIXME 缩放后清除可能依旧有问题  
         this.scale = 1;
         if (Nan.instance)
             console.error("Nan is already created, You can use getInstance() to get it");
@@ -200,7 +199,7 @@ var Nan = /** @class */ (function () {
         var nan = Nan.getInstance();
         var cleanX = nan.originPosition.x / nan.scale, cleanY = nan.originPosition.y / nan.scale, canvasWidth = nan.context.canvas.width, canvasHeight = nan.context.canvas.height;
         // console.log(cleanX, cleanY, canvasWidth, canvasHeight);
-        nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x + nan.extraCleanRect.x, canvasHeight / nan.originScale.y + nan.extraCleanRect.y); //清屏
+        nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x, canvasHeight / nan.originScale.y); //清屏
     };
     /**
      * 每帧刷新

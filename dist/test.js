@@ -4,7 +4,6 @@ import MapManager from './manager/mapmanager.js'
 
 let nan = new Nan(document.getElementById('canvas'),30);
 nan.canvasDraggable = true;
-nan.extraCleanRect = new Vector(0,0);
 let mapManager = new MapManager(99,99,new Vector(5,5));
 mapManager.init();
 

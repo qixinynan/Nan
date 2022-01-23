@@ -15,8 +15,7 @@ export default class Nan {
   public context: CanvasRenderingContext2D; //Canvas渲染器
   public objList: Array<GameObject> = []; //已加载的物体列表
   public canvasDraggable: boolean = true; //画布可否拖拽
-  public canvasScalable: boolean = true; //FIXME 缩放后清除可能依旧有问题
-  public extraCleanRect:Vector =  new Vector(0,0); //额外擦除区域
+  public canvasScalable: boolean = true; //FIXME 缩放后清除可能依旧有问题  
   public scale=1;
   /**
    *  构造函数初始化
@@ -70,7 +69,7 @@ export default class Nan {
         canvasWidth = nan.context.canvas.width,
         canvasHeight = nan.context.canvas.height;
     // console.log(cleanX, cleanY, canvasWidth, canvasHeight);
-    nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x  + nan.extraCleanRect.x, canvasHeight / nan.originScale.y  + nan.extraCleanRect.y); //清屏
+    nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x, canvasHeight / nan.originScale.y); //清屏
   }
 
   /**
