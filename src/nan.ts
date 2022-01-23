@@ -64,8 +64,8 @@ export default class Nan {
   // 清屏
   clear(){
     let nan = Nan.getInstance();
-    let cleanX = nan.originPosition.x/nan.scale,
-        cleanY = nan.originPosition.y/nan.scale,
+    let cleanX = nan.originPosition.x / nan.scale,
+        cleanY = nan.originPosition.y / nan.scale,
         canvasWidth = nan.context.canvas.width,
         canvasHeight = nan.context.canvas.height;
     // console.log(cleanX, cleanY, canvasWidth, canvasHeight);
@@ -127,7 +127,7 @@ export default class Nan {
    * @param name 名称
    * @returns Nan对象
    */
-  findGameObject(name: string): GameObject | null {
+  findGameObject(name: string): GameObject | null {    
     let result:GameObject | null = null;
     for (let i = 0; i < this.objList.length; i++) {
       let obj: GameObject = this.objList[i];

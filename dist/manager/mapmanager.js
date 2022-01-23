@@ -7,6 +7,7 @@ export default class MapManager {
   startPos = new Vector(0,0);
   selected = "";
   bc = 20;
+  maxHeight = 1000;
   static instance = null;
 //   itemMap = {}
 
@@ -29,11 +30,35 @@ export default class MapManager {
                 
         obj.onClick = ()=> {
           this.selected = obj.name;
-          document.getElementById("name").textContent = "左侧选择的对象名称：" + this.selected;
+          this.showMapItem();
         }
 
         nan.add(obj);
       }
     }
+  }
+
+  showMapItem() {
+    let nan = Nan.getInstance();
+    let obj = nan.findGameObject(MapManager.instance.selected);    
+
+    document.getElementById("name").textContent = "左侧选择的对象名称：" + this.selected;
+    document.getElementById("height").value = obj.height;
+  }
+
+  changeMapItem() {
+    let nan = Nan.getInstance();
+    let mapManager = MapManager.instance;
+    let obj = nan.findGameObject(MapManager.instance.selected);    
+
+    //Height
+    let height = document.getElementById('height').value;
+    
+    if (height > mapManager.maxHeight) {
+      alert("最大高度不能高于"+ mapManager.maxHeight);
+      height = mapManager.maxHeight;
+    }
+    obj.height = height;
+    obj.setHeightColor();    
   }
 }

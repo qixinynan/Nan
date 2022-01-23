@@ -10,6 +10,12 @@
   <div id="set">
     <h1>地图编辑器技术测试</h1>
     <p id="name">左侧选择的对象名称：</p>    
+    <input id="height" placeholder="高度"></input>
+    <select name="type" id="type">
+      <option value="0">平原</option>
+      <option value="1">海洋</option>
+    </select>
+    <button id="apply">确定修改</button>
   </div>
   <canvas id="canvas" width="1500px" height="800px"></canvas>  
 </body>
@@ -19,7 +25,7 @@
     float: left;  
     width: 300px;    
     height: 100%;
-    background-color: aqua;
+    background-color: rgb(255, 136, 0);    
   }
   #canvas {    
     background-color: rgb(238, 238, 238);    

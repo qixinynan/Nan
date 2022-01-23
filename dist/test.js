@@ -7,6 +7,9 @@ nan.canvasDraggable = true;
 let mapManager = new MapManager(99,99,new Vector(5,5));
 mapManager.init();
 
+let applyButton = document.getElementById("apply");
+applyButton.addEventListener('click',mapManager.changeMapItem)
+
 
 
 
