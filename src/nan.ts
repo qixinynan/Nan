@@ -132,10 +132,7 @@ export default class Nan {
       if (obj.name == name) {
         result = obj;
       }
-    }
-    if (!result) {
-      console.error("Can't find object by name: %s", name);
-    }
+    }    
     return result;
   }
 

@@ -160,8 +160,9 @@ var Nan = /** @class */ (function () {
         this.canvasDraggable = true; //画布可否拖拽
         this.canvasScalable = true; //FIXME 缩放后清除可能依旧有问题  
         this.scale = 1;
-        if (Nan.instance)
+        if (Nan.instance) {
             console.error("Nan is already created, You can use getInstance() to get it");
+        }
         else
             Nan.instance = this;
         if (!canvas)
@@ -182,9 +183,6 @@ var Nan = /** @class */ (function () {
      * @returns 单例
      */
     Nan.getInstance = function () {
-        if (!Nan.instance) {
-            console.error("Nan have not been create,Please create Nan first");
-        }
         return Nan.instance;
     };
     /**
@@ -259,9 +257,6 @@ var Nan = /** @class */ (function () {
             if (obj.name == name) {
                 result = obj;
             }
-        }
-        if (!result) {
-            console.error("Can't find object by name: %s", name);
         }
         return result;
     };
