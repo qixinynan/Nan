@@ -23,8 +23,9 @@ export default class Nan {
    * @param fps 刷新帧率
    */
   constructor(canvas: HTMLCanvasElement, fps: number = 60) {
-    if (Nan.instance)
-      console.error("Nan is already created, You can use getInstance() to get it");
+    if (Nan.instance){
+      console.error("Nan is already created, You can use getInstance() to get it");      
+    }
     else
       Nan.instance = this;
     if (!canvas)
@@ -46,10 +47,7 @@ export default class Nan {
    * 获取单例
    * @returns 单例
    */
-  static getInstance(): Nan {
-    if(!Nan.instance) {
-      console.error("Nan have not been create,Please create Nan first");
-    }
+  static getInstance(): Nan {    
     return Nan.instance;
   }
 
