@@ -18,29 +18,29 @@ export default class MapItem extends GameObject{
     this.phy.startAngles = Math.PI / 6;
 
     if (MapManager.instance.selected == this.name) {
-      this.phy.lateUpdate = (obj)=>{        
-        obj.lineColor = "yellow";
-        // obj.color = "red";
+      this.phy.lateUpdate = (obj)=>{
+        obj.lineColor = "red";
+        obj.color = "yellow";
       }
     }
     else {
       this.phy.lineWidth = 2;
-      this.setHeightColor();      
+      this.setHeightColor();
     }
     return [this.phy];
   }
 
   setHeightColor() {
     this.phy.lineColor = "black";
-    this.phy.color = this.getColorByHeight();    
+    this.phy.color = this.getColorByHeight();
   }
 
   getColorByHeight() {
-    let maxHeight = MapManager.instance.maxHeight;        
+    let maxHeight = MapManager.instance.maxHeight;
     let a = 255;
-    let b = 255 - this.height / maxHeight * 136;    
-    let c = 255 - this.height / maxHeight * 255;    
-    let color = "rgb(" + a + "," + b + "," + c + ")"    
+    let b = 255 - this.height / maxHeight * 136;
+    let c = 255 - this.height / maxHeight * 255;
+    let color = "rgb(" + a + "," + b + "," + c + ")"
     return color;
   }
 

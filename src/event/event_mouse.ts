@@ -25,8 +25,13 @@ export default class EventMouse extends NanEvent {
     let nan = Nan.getInstance();
     this.isMouseDown = false;
 
+    if (this.isDraging) {
+      this.isDraging = false;
+      return;
+    }
     let scale = nan.scale;
     var canvasBound = nan.context.canvas.getBoundingClientRect()
+
     for (let i = 0; i < nan.objList.length; i++) {
       const obj: GameObject = nan.objList[i];
       let x = e.clientX - canvasBound.left;
@@ -54,12 +59,15 @@ export default class EventMouse extends NanEvent {
     canvas.onmousemove = (e: MouseEvent) => {
       if (this.isMouseDown) {
         if (nan.canvasDraggable && (e.buttons == 2 || e.buttons == 1)) {
-          this.isDraging = true;
           var canvasBound = nan.context.canvas.getBoundingClientRect()
           let x = e.clientX - canvasBound.left;
           let y = e.clientY - canvasBound.top;
           let dragX = e.clientX - lastPos.x;
           let dragY = e.clientY - lastPos.y;
+          if (!dragX && !dragY) {
+            return;
+          }
+          this.isDraging = true;
           dragX /= nan.scale;
           dragY /= nan.scale;
           nan.translateOrigin(dragX, dragY);

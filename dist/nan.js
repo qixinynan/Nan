@@ -68,6 +68,10 @@ var EventMouse = /** @class */ (function (_super) {
     EventMouse.prototype.onClick = function (e) {
         var nan = Nan$1.getInstance();
         this.isMouseDown = false;
+        if (this.isDraging) {
+            this.isDraging = false;
+            return;
+        }
         var scale = nan.scale;
         var canvasBound = nan.context.canvas.getBoundingClientRect();
         for (var i = 0; i < nan.objList.length; i++) {
@@ -97,12 +101,15 @@ var EventMouse = /** @class */ (function (_super) {
         canvas.onmousemove = function (e) {
             if (_this.isMouseDown) {
                 if (nan.canvasDraggable && (e.buttons == 2 || e.buttons == 1)) {
-                    _this.isDraging = true;
                     var canvasBound = nan.context.canvas.getBoundingClientRect();
                     e.clientX - canvasBound.left;
                     e.clientY - canvasBound.top;
                     var dragX = e.clientX - lastPos.x;
                     var dragY = e.clientY - lastPos.y;
+                    if (!dragX && !dragY) {
+                        return;
+                    }
+                    _this.isDraging = true;
                     dragX /= nan.scale;
                     dragY /= nan.scale;
                     nan.translateOrigin(dragX, dragY);
