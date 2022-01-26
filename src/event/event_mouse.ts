@@ -16,7 +16,7 @@ export default class EventMouse extends NanEvent {
     canvas.onmouseup = this.onClick;
     canvas.onmousedown = this.onMouseDown;
     canvas.onwheel = this.onWheel;
-    canvas.oncontextmenu = function(e) {
+    canvas.oncontextmenu = function (e) {
       e.preventDefault();
     }
   }
@@ -24,19 +24,16 @@ export default class EventMouse extends NanEvent {
   onClick(e: MouseEvent) {
     let nan = Nan.getInstance();
     this.isMouseDown = false;
-    if(this.isDraging) {
-      this.isDraging = false;
-      return;
-    }
-    for (let i = 0; i < nan.objList.length ; i++) {
+
+    let scale = nan.scale;
+    var canvasBound = nan.context.canvas.getBoundingClientRect()
+    for (let i = 0; i < nan.objList.length; i++) {
       const obj: GameObject = nan.objList[i];
-      var canvasBound = nan.context.canvas.getBoundingClientRect()
       let x = e.clientX - canvasBound.left;
       let y = e.clientY - canvasBound.top;
-      let xOffset = x - obj.transform.position.x - obj.colliderStartPos.x + nan.originPosition.x;
-      let yOffset = y - obj.transform.position.y - obj.colliderStartPos.y + nan.originPosition.y;
-
-      if (0 <= xOffset && xOffset <= obj.collider.x && 0 <= yOffset && yOffset <= obj.collider.y) {
+      let xOffset = x - obj.transform.position.x * scale - obj.colliderStartPos.x * scale + nan.originPosition.x;
+      let yOffset = y - obj.transform.position.y * scale - obj.colliderStartPos.y * scale + nan.originPosition.y;
+      if (0 <= xOffset && xOffset <= obj.collider.x * scale && 0 <= yOffset && yOffset <= obj.collider.y * scale) {
         if (obj.onClick) {
           obj.onClick();
         }
@@ -47,7 +44,7 @@ export default class EventMouse extends NanEvent {
   /**
    * 按下事件处理
    */
-   //TODO client坐标在canvas坐标变更后可能失效
+  //TODO client坐标在canvas坐标变更后可能失效
   onMouseDown(de: MouseEvent) {
     let nan = Nan.getInstance();
     let canvas = nan.getContext().canvas;
@@ -63,8 +60,8 @@ export default class EventMouse extends NanEvent {
           let y = e.clientY - canvasBound.top;
           let dragX = e.clientX - lastPos.x;
           let dragY = e.clientY - lastPos.y;
-          dragX/=nan.scale;
-          dragY/=nan.scale;
+          dragX /= nan.scale;
+          dragY /= nan.scale;
           nan.translateOrigin(dragX, dragY);
           lastPos = new Vector(e.clientX, e.clientY);
         }
@@ -72,7 +69,7 @@ export default class EventMouse extends NanEvent {
     }
     canvas.onmouseout = () => {
       this.isMouseDown = false;
-      if(this.isDraging) {
+      if (this.isDraging) {
         this.isDraging = false;
       }
     }

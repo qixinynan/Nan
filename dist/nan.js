@@ -68,18 +68,15 @@ var EventMouse = /** @class */ (function (_super) {
     EventMouse.prototype.onClick = function (e) {
         var nan = Nan$1.getInstance();
         this.isMouseDown = false;
-        if (this.isDraging) {
-            this.isDraging = false;
-            return;
-        }
+        var scale = nan.scale;
+        var canvasBound = nan.context.canvas.getBoundingClientRect();
         for (var i = 0; i < nan.objList.length; i++) {
             var obj = nan.objList[i];
-            var canvasBound = nan.context.canvas.getBoundingClientRect();
             var x = e.clientX - canvasBound.left;
             var y = e.clientY - canvasBound.top;
-            var xOffset = x - obj.transform.position.x - obj.colliderStartPos.x + nan.originPosition.x;
-            var yOffset = y - obj.transform.position.y - obj.colliderStartPos.y + nan.originPosition.y;
-            if (0 <= xOffset && xOffset <= obj.collider.x && 0 <= yOffset && yOffset <= obj.collider.y) {
+            var xOffset = x - obj.transform.position.x * scale - obj.colliderStartPos.x * scale + nan.originPosition.x;
+            var yOffset = y - obj.transform.position.y * scale - obj.colliderStartPos.y * scale + nan.originPosition.y;
+            if (0 <= xOffset && xOffset <= obj.collider.x * scale && 0 <= yOffset && yOffset <= obj.collider.y * scale) {
                 if (obj.onClick) {
                     obj.onClick();
                 }
