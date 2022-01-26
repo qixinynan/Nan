@@ -1,5 +1,5 @@
 import MapManager from "../manager/mapmanager.js";
-import { GameObject, Polygon, Transform, Vector, Utils } from "../nan.js";
+import { GameObject, Polygon, Transform, Vector, Utils } from "../../dist/nan.js";
 
 export default class MapItem extends GameObject {
   bc = 50;
