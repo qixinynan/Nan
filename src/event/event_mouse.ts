@@ -35,6 +35,7 @@ export default class EventMouse extends NanEvent {
       let y = e.clientY - canvasBound.top;
       let xOffset = x - obj.transform.position.x - obj.colliderStartPos.x + nan.originPosition.x;
       let yOffset = y - obj.transform.position.y - obj.colliderStartPos.y + nan.originPosition.y;
+
       if (0 <= xOffset && xOffset <= obj.collider.x && 0 <= yOffset && yOffset <= obj.collider.y) {
         if (obj.onClick) {
           obj.onClick();

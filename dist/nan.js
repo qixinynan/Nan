@@ -151,23 +151,22 @@ var Nan = /** @class */ (function () {
      * @param canvas Canvas对象
      * @param fps 刷新帧率
      */
-    function Nan(canvas, fps) {
-        if (fps === void 0) { fps = 60; }
+    function Nan(canvas) {
+        this.fps = 5; //帧率
         this.eventManager = new EventManager();
         this.originPosition = new Vector(0, 0);
         this.originScale = new Vector(1, 1);
         this.objList = []; //已加载的物体列表
-        this.canvasDraggable = true; //画布可否拖拽
-        this.canvasScalable = true; //FIXME 缩放后清除可能依旧有问题  
+        this.canvasDraggable = true; //画布可否可拖拽
+        this.canvasScalable = true; //画布是否可缩放
+        this.autoUpdate = true;
         this.scale = 1;
-        if (Nan.instance) {
+        if (Nan.instance)
             console.error("Nan is already created, You can use getInstance() to get it");
-        }
         else
             Nan.instance = this;
         if (!canvas)
             console.error("Canvas can't be null");
-        this.fps = fps;
         this.context = canvas.getContext('2d');
         this.init();
     }
@@ -176,7 +175,9 @@ var Nan = /** @class */ (function () {
    */
     Nan.prototype.init = function () {
         this.eventManager.init();
-        setInterval(this.update, 1000 / this.fps);
+        if (this.autoUpdate) {
+            setInterval(this.update, 1000 / this.fps);
+        }
     };
     /**
      * 获取单例
@@ -208,17 +209,7 @@ var Nan = /** @class */ (function () {
         nan.clear();
         for (var i = 0; i < nan.objList.length; i++) {
             var gameObj = nan.objList[i];
-            var nanObjList = gameObj.update();
-            if (nanObjList) {
-                if (!nanObjList.length) { //若没有length对象便就断言不是array对象
-                    console.error("Function update() must return a array of GameObject");
-                }
-                for (var j = 0; j < nanObjList.length; j++) {
-                    var nanObj = nanObjList[j];
-                    allNanObjList.push(nanObj);
-                    nanObj._update();
-                }
-            }
+            gameObj.update();
         }
         for (var i = 0; i < allNanObjList.length; i++) {
             allNanObjList[i]._lateUpdate();
@@ -240,8 +231,8 @@ var Nan = /** @class */ (function () {
      * @param obj GameObject对象
      */
     Nan.prototype.add = function (obj) {
-        if (!obj.update()) {
-            console.warn("The gameobject named %s hasn't return any NanObject in update()", obj.name);
+        if (!obj.render) {
+            console.warn("The gameobject named %s hasn't return any NanObject in render()", obj.name);
         }
         this.objList.push(obj);
     };
@@ -335,12 +326,17 @@ var GameObject = /** @class */ (function () {
     /**
      * Update会在每帧调用一次
      *
-     * Update应当返回一个NanObject的列表
      * @returns NanObject[]
      */
     GameObject.prototype.update = function () {
         this.colliderStartPos = new Vector((this.transform.size.x - this.collider.x) / 2, (this.transform.size.y - this.collider.y) / 2);
-        return undefined;
+        if (this.render) {
+            var nanObjectList = this.render();
+            for (var i = 0; i < nanObjectList.length; i++) {
+                var nanObject = nanObjectList[i];
+                nanObject._update();
+            }
+        }
     };
     GameObject.prototype.lateUpdate = function () {
     };

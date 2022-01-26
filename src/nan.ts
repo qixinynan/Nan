@@ -6,48 +6,49 @@ import EventManager from './event/eventmanager';
 
 export default class Nan {
 
-  private static instance:Nan; //单例
-  private fps: number; //帧率
+  private static instance: Nan; //单例
+  private fps: number = 5; //帧率
   private eventManager: EventManager = new EventManager();
 
   public originPosition: Vector = new Vector(0, 0);
   public originScale: Vector = new Vector(1, 1);
   public context: CanvasRenderingContext2D; //Canvas渲染器
   public objList: Array<GameObject> = []; //已加载的物体列表
-  public canvasDraggable: boolean = true; //画布可否拖拽
-  public canvasScalable: boolean = true; //FIXME 缩放后清除可能依旧有问题  
-  public scale=1;
+  public canvasDraggable: boolean = true; //画布可否可拖拽
+  public canvasScalable: boolean = true; //画布是否可缩放
+  public autoUpdate: boolean = true;
+  public scale = 1;
   /**
    *  构造函数初始化
    * @param canvas Canvas对象
    * @param fps 刷新帧率
    */
-  constructor(canvas: HTMLCanvasElement, fps: number = 60) {
-    if (Nan.instance){
-      console.error("Nan is already created, You can use getInstance() to get it");      
-    }
+  constructor(canvas: HTMLCanvasElement) {
+    if (Nan.instance)
+      console.error("Nan is already created, You can use getInstance() to get it");
     else
       Nan.instance = this;
     if (!canvas)
       console.error("Canvas can't be null")
-    this.fps = fps;
     this.context = canvas.getContext('2d') as CanvasRenderingContext2D;
     this.init();
   }
 
-    /**
-   * 初始化
-   */
+  /**
+ * 初始化
+ */
   init() {
     this.eventManager.init();
-    setInterval(this.update, 1000/this.fps);
+    if (this.autoUpdate) {
+      setInterval(this.update, 1000 / this.fps);
+    }
   }
 
   /**
    * 获取单例
    * @returns 单例
    */
-  static getInstance(): Nan {    
+  static getInstance(): Nan {
     return Nan.instance;
   }
 
@@ -60,12 +61,12 @@ export default class Nan {
   }
 
   // 清屏
-  clear(){
+  clear() {
     let nan = Nan.getInstance();
     let cleanX = nan.originPosition.x / nan.scale,
-        cleanY = nan.originPosition.y / nan.scale,
-        canvasWidth = nan.context.canvas.width,
-        canvasHeight = nan.context.canvas.height;
+      cleanY = nan.originPosition.y / nan.scale,
+      canvasWidth = nan.context.canvas.width,
+      canvasHeight = nan.context.canvas.height;
     // console.log(cleanX, cleanY, canvasWidth, canvasHeight);
     nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x, canvasHeight / nan.originScale.y); //清屏
   }
@@ -80,17 +81,7 @@ export default class Nan {
 
     for (let i = 0; i < nan.objList.length; i++) {
       let gameObj: GameObject = nan.objList[i];
-      let nanObjList: NanObject[] = gameObj.update() as NanObject[];
-      if (nanObjList) {
-        if (!nanObjList.length) { //若没有length对象便就断言不是array对象
-          console.error("Function update() must return a array of GameObject");
-        }
-        for (let j = 0; j < nanObjList.length; j++) {
-          const nanObj = nanObjList[j];
-          allNanObjList.push(nanObj);
-          nanObj._update();
-        }
-      }
+      gameObj.update();
     }
     for (let i = 0; i < allNanObjList.length; i++) {
       allNanObjList[i]._lateUpdate();
@@ -114,8 +105,8 @@ export default class Nan {
    * @param obj GameObject对象
    */
   add(obj: GameObject) {
-    if(!obj.update()) {
-      console.warn("The gameobject named %s hasn't return any NanObject in update()",obj.name);
+    if (!obj.render) {
+      console.warn("The gameobject named %s hasn't return any NanObject in render()", obj.name);
     }
     this.objList.push(obj);
   }
@@ -125,14 +116,14 @@ export default class Nan {
    * @param name 名称
    * @returns Nan对象
    */
-  findGameObject(name: string): GameObject | null {    
-    let result:GameObject | null = null;
+  findGameObject(name: string): GameObject | null {
+    let result: GameObject | null = null;
     for (let i = 0; i < this.objList.length; i++) {
       let obj: GameObject = this.objList[i];
       if (obj.name == name) {
         result = obj;
       }
-    }    
+    }
     return result;
   }
 
@@ -143,7 +134,7 @@ export default class Nan {
    */
   translateOrigin(x: number, y: number) {
     this.context.translate(x, y);
-    this.originPosition = new Vector(this.originPosition.x - x*this.scale,this.originPosition.y - y*this.scale);
+    this.originPosition = new Vector(this.originPosition.x - x * this.scale, this.originPosition.y - y * this.scale);
     // console.log(x,y, this.originPosition.x, this.originPosition.y);
   }
 
@@ -163,8 +154,8 @@ export default class Nan {
    */
   //TODO 以中心缩放
   scaleOrigin(x: number) {
-    if(this.scale<0.1 && x<1) return;
-    if(this.scale>3 && x>1) return;
+    if (this.scale < 0.1 && x < 1) return;
+    if (this.scale > 3 && x > 1) return;
     this.scale *= x;
     this.context.scale(x, x);
     this.originScale = new Vector(this.originScale.x * x, this.originScale.y * x)

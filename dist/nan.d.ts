@@ -10,13 +10,14 @@ export default class Nan {
     objList: Array<GameObject>;
     canvasDraggable: boolean;
     canvasScalable: boolean;
+    autoUpdate: boolean;
     scale: number;
     /**
      *  构造函数初始化
      * @param canvas Canvas对象
      * @param fps 刷新帧率
      */
-    constructor(canvas: HTMLCanvasElement, fps?: number);
+    constructor(canvas: HTMLCanvasElement);
     /**
    * 初始化
    */
