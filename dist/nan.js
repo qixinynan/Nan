@@ -72,6 +72,7 @@ var EventMouse = /** @class */ (function (_super) {
             this.isDraging = false;
             return;
         }
+        this.isDraging = false;
         var scale = nan.scale;
         var canvasBound = nan.context.canvas.getBoundingClientRect();
         for (var i = 0; i < nan.objList.length; i++) {
@@ -106,7 +107,8 @@ var EventMouse = /** @class */ (function (_super) {
                     e.clientY - canvasBound.top;
                     var dragX = e.clientX - lastPos.x;
                     var dragY = e.clientY - lastPos.y;
-                    if (!dragX && !dragY) {
+                    if (Math.abs(dragX) < 5 && Math.abs(dragY) < 5) {
+                        _this.isDraging = false;
                         return;
                     }
                     _this.isDraging = true;

@@ -29,6 +29,8 @@ export default class EventMouse extends NanEvent {
       this.isDraging = false;
       return;
     }
+
+    this.isDraging = false;
     let scale = nan.scale;
     var canvasBound = nan.context.canvas.getBoundingClientRect()
 
@@ -64,9 +66,11 @@ export default class EventMouse extends NanEvent {
           let y = e.clientY - canvasBound.top;
           let dragX = e.clientX - lastPos.x;
           let dragY = e.clientY - lastPos.y;
-          if (!dragX && !dragY) {
+          if (Math.abs(dragX) < 5 && Math.abs(dragY) < 5) {
+            this.isDraging = false;
             return;
           }
+
           this.isDraging = true;
           dragX /= nan.scale;
           dragY /= nan.scale;
