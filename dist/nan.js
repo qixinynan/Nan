@@ -72,14 +72,16 @@ var EventMouse = /** @class */ (function (_super) {
             this.isDraging = false;
             return;
         }
+        this.isDraging = false;
+        var scale = nan.scale;
+        var canvasBound = nan.context.canvas.getBoundingClientRect();
         for (var i = 0; i < nan.objList.length; i++) {
             var obj = nan.objList[i];
-            var canvasBound = nan.context.canvas.getBoundingClientRect();
             var x = e.clientX - canvasBound.left;
             var y = e.clientY - canvasBound.top;
-            var xOffset = x - obj.transform.position.x - obj.colliderStartPos.x + nan.originPosition.x;
-            var yOffset = y - obj.transform.position.y - obj.colliderStartPos.y + nan.originPosition.y;
-            if (0 <= xOffset && xOffset <= obj.collider.x && 0 <= yOffset && yOffset <= obj.collider.y) {
+            var xOffset = x - obj.transform.position.x * scale - obj.colliderStartPos.x * scale + nan.originPosition.x;
+            var yOffset = y - obj.transform.position.y * scale - obj.colliderStartPos.y * scale + nan.originPosition.y;
+            if (0 <= xOffset && xOffset <= obj.collider.x * scale && 0 <= yOffset && yOffset <= obj.collider.y * scale) {
                 if (obj.onClick) {
                     obj.onClick();
                 }
@@ -100,15 +102,20 @@ var EventMouse = /** @class */ (function (_super) {
         canvas.onmousemove = function (e) {
             if (_this.isMouseDown) {
                 if (nan.canvasDraggable && (e.buttons == 2 || e.buttons == 1)) {
+                    var canvasBound = nan.context.canvas.getBoundingClientRect();
+                    e.clientX - canvasBound.left;
+                    e.clientY - canvasBound.top;
                     var dragX = e.clientX - lastPos.x;
                     var dragY = e.clientY - lastPos.y;
+                    if (Math.abs(dragX) < 5 && Math.abs(dragY) < 5) {
+                        _this.isDraging = false;
+                        return;
+                    }
+                    _this.isDraging = true;
                     dragX /= nan.scale;
                     dragY /= nan.scale;
-                    if (Math.abs(dragX) >= 3 || Math.abs(dragY) >= 3) {
-                        _this.isDraging = true;
-                        nan.translateOrigin(dragX, dragY);
-                        lastPos = new Vector(e.clientX, e.clientY);
-                    }
+                    nan.translateOrigin(dragX, dragY);
+                    lastPos = new Vector(e.clientX, e.clientY);
                 }
             }
         };

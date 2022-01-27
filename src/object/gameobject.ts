@@ -4,7 +4,7 @@ import Nan from "nan";
 import Transform from "utils/transform";
 import Vector from "utils/vector";
 import NanObject from "./nanobject";
-/** 
+/**
 * NanObject是Nan框架的基石。任何能够在Canvas上看得见的东西都应当是GameObject的派生类
 */
 export default class GameObject {
@@ -91,4 +91,4 @@ export default class GameObject {
     context.strokeStyle = color;
     context.stroke();
   }
-} 
+}

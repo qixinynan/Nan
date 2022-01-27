@@ -28,15 +28,18 @@ export default class EventMouse extends NanEvent {
       this.isDraging = false;
       return;
     }
+
+    this.isDraging = false;
+    let scale = nan.scale;
+    var canvasBound = nan.context.canvas.getBoundingClientRect()
+
     for (let i = 0; i < nan.objList.length; i++) {
       const obj: GameObject = nan.objList[i];
-      var canvasBound = nan.context.canvas.getBoundingClientRect()
       let x = e.clientX - canvasBound.left;
       let y = e.clientY - canvasBound.top;
-      let xOffset = x - obj.transform.position.x - obj.colliderStartPos.x + nan.originPosition.x;
-      let yOffset = y - obj.transform.position.y - obj.colliderStartPos.y + nan.originPosition.y;
-
-      if (0 <= xOffset && xOffset <= obj.collider.x && 0 <= yOffset && yOffset <= obj.collider.y) {
+      let xOffset = x - obj.transform.position.x * scale - obj.colliderStartPos.x * scale + nan.originPosition.x;
+      let yOffset = y - obj.transform.position.y * scale - obj.colliderStartPos.y * scale + nan.originPosition.y;
+      if (0 <= xOffset && xOffset <= obj.collider.x * scale && 0 <= yOffset && yOffset <= obj.collider.y * scale) {
         if (obj.onClick) {
           obj.onClick();
         }
@@ -57,15 +60,21 @@ export default class EventMouse extends NanEvent {
     canvas.onmousemove = (e: MouseEvent) => {
       if (this.isMouseDown) {
         if (nan.canvasDraggable && (e.buttons == 2 || e.buttons == 1)) {
+          var canvasBound = nan.context.canvas.getBoundingClientRect()
+          let x = e.clientX - canvasBound.left;
+          let y = e.clientY - canvasBound.top;
           let dragX = e.clientX - lastPos.x;
           let dragY = e.clientY - lastPos.y;
+          if (Math.abs(dragX) < 5 && Math.abs(dragY) < 5) {
+            this.isDraging = false;
+            return;
+          }
+
+          this.isDraging = true;
           dragX /= nan.scale;
           dragY /= nan.scale;
-          if (Math.abs(dragX) >= 3 || Math.abs(dragY) >= 3) {
-            this.isDraging = true;
-            nan.translateOrigin(dragX, dragY);
-            lastPos = new Vector(e.clientX, e.clientY);
-          }
+          nan.translateOrigin(dragX, dragY);
+          lastPos = new Vector(e.clientX, e.clientY);
         }
       }
     }
