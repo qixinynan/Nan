@@ -7,8 +7,9 @@ import EventManager from './event/eventmanager';
 export default class Nan {
 
   private static instance: Nan; //单例
-  private fps: number = 5; //帧率
+  private fps: number = 30; //帧率
   private eventManager: EventManager = new EventManager();
+  private lastUpdateTime: number = 0;
 
   public originPosition: Vector = new Vector(0, 0);
   public originScale: Vector = new Vector(1, 1);
@@ -16,7 +17,7 @@ export default class Nan {
   public objList: Array<GameObject> = []; //已加载的物体列表
   public canvasDraggable: boolean = true; //画布可否可拖拽
   public canvasScalable: boolean = true; //画布是否可缩放
-  public autoUpdate: boolean = true;
+  public autoUpdate: boolean = false;
   public scale = 1;
   /**
    *  构造函数初始化
@@ -40,7 +41,7 @@ export default class Nan {
   init() {
     this.eventManager.init();
     if (this.autoUpdate) {
-      setInterval(this.update, 1000 / this.fps);
+      setInterval(Nan.update, 1000 / this.fps);
     }
   }
 
@@ -67,28 +68,35 @@ export default class Nan {
       cleanY = nan.originPosition.y / nan.scale,
       canvasWidth = nan.context.canvas.width,
       canvasHeight = nan.context.canvas.height;
-    // console.log(cleanX, cleanY, canvasWidth, canvasHeight);
     nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x, canvasHeight / nan.originScale.y); //清屏
   }
 
   /**
-   * 每帧刷新
+   * 更新
    */
-  update() {
+  public static update() {
     let nan = Nan.getInstance();
-    let allNanObjList: NanObject[] = [];
     nan.clear();
 
     for (let i = 0; i < nan.objList.length; i++) {
       let gameObj: GameObject = nan.objList[i];
-      gameObj.update();
-    }
-    for (let i = 0; i < allNanObjList.length; i++) {
-      allNanObjList[i]._lateUpdate();
+      gameObj._update();
     }
     nan.lateUpdate();
+    nan.lastUpdateTime = Date.now();
   }
 
+  /**
+   * 渲染
+   */
+  public static render(): boolean {
+    let nan = Nan.getInstance();
+    if (Date.now() - nan.lastUpdateTime > 30) {
+      this.update();
+      return true;
+    }
+    return false;
+  }
   /**
    * update执行后执行
    */
@@ -104,11 +112,14 @@ export default class Nan {
    * 添加GameObject对象
    * @param obj GameObject对象
    */
-  add(obj: GameObject) {
-    if (!obj.render) {
-      console.warn("The gameobject named %s hasn't return any NanObject in render()", obj.name);
+  add(obj: GameObject, autoUpdate = true) {
+    if (!obj.update) {
+      console.warn("The gameobject named %s hasn't return any NanObject in update()", obj.name);
     }
     this.objList.push(obj);
+    if (autoUpdate) {
+      Nan.render();
+    }
   }
 
   /**
@@ -135,7 +146,9 @@ export default class Nan {
   translateOrigin(x: number, y: number) {
     this.context.translate(x, y);
     this.originPosition = new Vector(this.originPosition.x - x * this.scale, this.originPosition.y - y * this.scale);
-    // console.log(x,y, this.originPosition.x, this.originPosition.y);
+    if (!this.autoUpdate) {
+      Nan.render();
+    }
   }
 
   /**
@@ -159,5 +172,8 @@ export default class Nan {
     this.scale *= x;
     this.context.scale(x, x);
     this.originScale = new Vector(this.originScale.x * x, this.originScale.y * x)
+    if (!this.autoUpdate) {
+      Nan.render();
+    }
   }
 }

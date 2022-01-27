@@ -31,11 +31,13 @@ export default class MapManager {
         obj.onClick = () => {
           this.selected = obj.name;
           this.showMapItem();
+          Nan.render();
         }
 
         nan.add(obj);
       }
     }
+    Nan.update();
   }
 
   showMapItem() {
@@ -60,5 +62,6 @@ export default class MapManager {
     }
     obj.height = height;
     obj.setHeightColor();
+    Nan.render();
   }
 }

@@ -4,6 +4,7 @@ export default class Nan {
     private static instance;
     private fps;
     private eventManager;
+    private lastUpdateTime;
     originPosition: Vector;
     originScale: Vector;
     context: CanvasRenderingContext2D;
@@ -34,9 +35,13 @@ export default class Nan {
     getContext(): CanvasRenderingContext2D;
     clear(): void;
     /**
-     * 每帧刷新
+     * 更新
      */
-    update(): void;
+    static update(): void;
+    /**
+     * 渲染
+     */
+    static render(): boolean;
     /**
      * update执行后执行
      */
@@ -45,7 +50,7 @@ export default class Nan {
      * 添加GameObject对象
      * @param obj GameObject对象
      */
-    add(obj: GameObject): void;
+    add(obj: GameObject, autoUpdate?: boolean): void;
     /**
      * 查询Nan对象
      * @param name 名称

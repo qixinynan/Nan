@@ -10,15 +10,15 @@ export default class GameObject {
     collider: Vector;
     colliderStartPos: Vector;
     onClick: Function | undefined;
-    render: (() => NanObject[]) | undefined;
+    update: (() => NanObject[]) | undefined;
     constructor(name: string, transform?: Transform);
     init(): void;
     /**
      * Update会在每帧调用一次
      *
-     * @returns NanObject[]
      */
-    update(): void;
+    _update(): void;
+    render(): void;
     lateUpdate(): void;
     showColliderLine(color?: string, lineWidth?: number): void;
     showFrameLine(color?: string, lineWidth?: number): void;

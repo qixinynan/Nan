@@ -4,7 +4,7 @@ import MapManager from './manager/mapmanager.js'
 
 let nan = new Nan(document.getElementById('canvas'), 30);
 nan.canvasDraggable = true;
-let mapManager = new MapManager(99, 99, new Vector(5, 5));
+let mapManager = new MapManager(30, 30, new Vector(5, 5));
 mapManager.init();
 
 let applyButton = document.getElementById("apply");

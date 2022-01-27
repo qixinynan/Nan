@@ -24,5 +24,6 @@ export default class NanObject {
      */
     _update(): void;
     _lateUpdate(): void;
+    render(): void;
     showFrameLine(color?: string, lineWidth?: number): void;
 }

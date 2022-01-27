@@ -1,5 +1,5 @@
 import MapManager from "../manager/mapmanager.js";
-import { GameObject, Polygon, Transform, Vector, Utils } from "../../dist/nan.js";
+import { Nan, GameObject, Polygon, Transform, Vector, Utils } from "../../dist/nan.js";
 
 export default class MapItem extends GameObject {
   bc = 50;
@@ -12,19 +12,21 @@ export default class MapItem extends GameObject {
     this.phy.lineWidth = 5;
   }
 
-  render = () => {
+  update = () => {
     this.phy.offsetX = Math.sqrt(this.bc * this.bc * 3);
     this.phy.startAngles = Math.PI / 6;
 
     if (MapManager.instance.selected == this.name) {
       this.phy.lateUpdate = (obj) => {
+        console.log("LINE COLOR");
         obj.lineColor = "yellow";
-        // obj.color = "red";
+        obj.render();
       }
     }
     else {
       this.phy.lineWidth = 2;
       this.setHeightColor();
+      this.phy.lateUpdate = undefined;
     }
     return [this.phy];
   }
@@ -41,10 +43,5 @@ export default class MapItem extends GameObject {
     let c = 255 - this.height / maxHeight * 255;
     let color = "rgb(" + a + "," + b + "," + c + ")"
     return color;
-  }
-
-  lateUpdate() {
-    // this.showColliderLine();
-    // this.showFrameLine();
   }
 }

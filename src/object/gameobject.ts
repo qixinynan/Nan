@@ -14,7 +14,7 @@ export default class GameObject {
   public colliderStartPos: Vector = new Vector(0, 0);
   public onClick: Function | undefined;
   //渲染回调函数，渲染请在该函数操作
-  public render: (() => NanObject[]) | undefined;
+  public update: (() => NanObject[]) | undefined;
 
   constructor(name: string, transform: Transform = new Transform(Vector.zero, Vector.zero, Vector.zero)) {
     if (!name) {
@@ -29,25 +29,35 @@ export default class GameObject {
 
   /**
    * Update会在每帧调用一次
-   *    
-   * @returns NanObject[]
+   *       
    */
-  update(): void {
+  _update(): void {
     this.colliderStartPos = new Vector(
       (this.transform.size.x - this.collider.x) / 2,
       (this.transform.size.y - this.collider.y) / 2,
     )
-    if (this.render) {
-      const nanObjectList: NanObject[] = this.render();
+    if (this.update) {
+      const nanObjectList: NanObject[] = this.update();
       for (let i = 0; i < nanObjectList.length; i++) {
         const nanObject = nanObjectList[i];
         nanObject._update();
       }
     }
-
   }
 
-  lateUpdate() {
+  render(): void {
+    this._update();
+    this.lateUpdate();
+  }
+
+  lateUpdate(): void {
+    if (this.update) {
+      const nanObjectList: NanObject[] = this.update();
+      for (let i = 0; i < nanObjectList.length; i++) {
+        const nanObject = nanObjectList[i];
+        nanObject._lateUpdate();
+      }
+    }
   }
 
   showColliderLine(color: string = "yellow", lineWidth: number = 1) {

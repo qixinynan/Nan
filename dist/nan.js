@@ -100,16 +100,15 @@ var EventMouse = /** @class */ (function (_super) {
         canvas.onmousemove = function (e) {
             if (_this.isMouseDown) {
                 if (nan.canvasDraggable && (e.buttons == 2 || e.buttons == 1)) {
-                    _this.isDraging = true;
-                    var canvasBound = nan.context.canvas.getBoundingClientRect();
-                    e.clientX - canvasBound.left;
-                    e.clientY - canvasBound.top;
                     var dragX = e.clientX - lastPos.x;
                     var dragY = e.clientY - lastPos.y;
                     dragX /= nan.scale;
                     dragY /= nan.scale;
-                    nan.translateOrigin(dragX, dragY);
-                    lastPos = new Vector(e.clientX, e.clientY);
+                    if (Math.abs(dragX) >= 3 || Math.abs(dragY) >= 3) {
+                        _this.isDraging = true;
+                        nan.translateOrigin(dragX, dragY);
+                        lastPos = new Vector(e.clientX, e.clientY);
+                    }
                 }
             }
         };
@@ -152,14 +151,15 @@ var Nan = /** @class */ (function () {
      * @param fps 刷新帧率
      */
     function Nan(canvas) {
-        this.fps = 5; //帧率
+        this.fps = 30; //帧率
         this.eventManager = new EventManager();
+        this.lastUpdateTime = 0;
         this.originPosition = new Vector(0, 0);
         this.originScale = new Vector(1, 1);
         this.objList = []; //已加载的物体列表
         this.canvasDraggable = true; //画布可否可拖拽
         this.canvasScalable = true; //画布是否可缩放
-        this.autoUpdate = true;
+        this.autoUpdate = false;
         this.scale = 1;
         if (Nan.instance)
             console.error("Nan is already created, You can use getInstance() to get it");
@@ -176,7 +176,7 @@ var Nan = /** @class */ (function () {
     Nan.prototype.init = function () {
         this.eventManager.init();
         if (this.autoUpdate) {
-            setInterval(this.update, 1000 / this.fps);
+            setInterval(Nan.update, 1000 / this.fps);
         }
     };
     /**
@@ -197,24 +197,31 @@ var Nan = /** @class */ (function () {
     Nan.prototype.clear = function () {
         var nan = Nan.getInstance();
         var cleanX = nan.originPosition.x / nan.scale, cleanY = nan.originPosition.y / nan.scale, canvasWidth = nan.context.canvas.width, canvasHeight = nan.context.canvas.height;
-        // console.log(cleanX, cleanY, canvasWidth, canvasHeight);
         nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x, canvasHeight / nan.originScale.y); //清屏
     };
     /**
-     * 每帧刷新
+     * 更新
      */
-    Nan.prototype.update = function () {
+    Nan.update = function () {
         var nan = Nan.getInstance();
-        var allNanObjList = [];
         nan.clear();
         for (var i = 0; i < nan.objList.length; i++) {
             var gameObj = nan.objList[i];
-            gameObj.update();
-        }
-        for (var i = 0; i < allNanObjList.length; i++) {
-            allNanObjList[i]._lateUpdate();
+            gameObj._update();
         }
         nan.lateUpdate();
+        nan.lastUpdateTime = Date.now();
+    };
+    /**
+     * 渲染
+     */
+    Nan.render = function () {
+        var nan = Nan.getInstance();
+        if (Date.now() - nan.lastUpdateTime > 30) {
+            this.update();
+            return true;
+        }
+        return false;
     };
     /**
      * update执行后执行
@@ -230,11 +237,15 @@ var Nan = /** @class */ (function () {
      * 添加GameObject对象
      * @param obj GameObject对象
      */
-    Nan.prototype.add = function (obj) {
-        if (!obj.render) {
-            console.warn("The gameobject named %s hasn't return any NanObject in render()", obj.name);
+    Nan.prototype.add = function (obj, autoUpdate) {
+        if (autoUpdate === void 0) { autoUpdate = true; }
+        if (!obj.update) {
+            console.warn("The gameobject named %s hasn't return any NanObject in update()", obj.name);
         }
         this.objList.push(obj);
+        if (autoUpdate) {
+            Nan.render();
+        }
     };
     /**
      * 查询Nan对象
@@ -259,7 +270,9 @@ var Nan = /** @class */ (function () {
     Nan.prototype.translateOrigin = function (x, y) {
         this.context.translate(x, y);
         this.originPosition = new Vector(this.originPosition.x - x * this.scale, this.originPosition.y - y * this.scale);
-        // console.log(x,y, this.originPosition.x, this.originPosition.y);
+        if (!this.autoUpdate) {
+            Nan.render();
+        }
     };
     /**
      * 移动“到”坐标原点并记录
@@ -283,6 +296,9 @@ var Nan = /** @class */ (function () {
         this.scale *= x;
         this.context.scale(x, x);
         this.originScale = new Vector(this.originScale.x * x, this.originScale.y * x);
+        if (!this.autoUpdate) {
+            Nan.render();
+        }
     };
     return Nan;
 }());
@@ -326,19 +342,29 @@ var GameObject = /** @class */ (function () {
     /**
      * Update会在每帧调用一次
      *
-     * @returns NanObject[]
      */
-    GameObject.prototype.update = function () {
+    GameObject.prototype._update = function () {
         this.colliderStartPos = new Vector((this.transform.size.x - this.collider.x) / 2, (this.transform.size.y - this.collider.y) / 2);
-        if (this.render) {
-            var nanObjectList = this.render();
+        if (this.update) {
+            var nanObjectList = this.update();
             for (var i = 0; i < nanObjectList.length; i++) {
                 var nanObject = nanObjectList[i];
                 nanObject._update();
             }
         }
     };
+    GameObject.prototype.render = function () {
+        this._update();
+        this.lateUpdate();
+    };
     GameObject.prototype.lateUpdate = function () {
+        if (this.update) {
+            var nanObjectList = this.update();
+            for (var i = 0; i < nanObjectList.length; i++) {
+                var nanObject = nanObjectList[i];
+                nanObject._lateUpdate();
+            }
+        }
     };
     GameObject.prototype.showColliderLine = function (color, lineWidth) {
         if (color === void 0) { color = "yellow"; }
@@ -407,6 +433,9 @@ var NanObject = /** @class */ (function () {
         if (this.lateUpdate) {
             this.lateUpdate(this);
         }
+    };
+    NanObject.prototype.render = function () {
+        this._update();
     };
     NanObject.prototype.showFrameLine = function (color, lineWidth) {
         if (color === void 0) { color = "red"; }
