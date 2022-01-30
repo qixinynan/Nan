@@ -25,7 +25,7 @@ export default class Sprite extends NanObject {
   /**
    * 内部帧更新函数
    */
-  _update(): void {        
+  async _update() {        
     super._update();
     this.context.drawImage(
       this.image,

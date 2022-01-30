@@ -74,25 +74,25 @@ export default class Nan {
   /**
    * 更新
    */
-  public static update() {
+  public static async update() {
     let nan = Nan.getInstance();
     nan.clear();
 
     for (let i = 0; i < nan.objList.length; i++) {
       let gameObj: GameObject = nan.objList[i];
-      gameObj._update();
+      await gameObj._update();
     }
-    nan.lateUpdate();
+    await nan.lateUpdate();
     nan.lastUpdateTime = Date.now();
   }
 
   /**
    * 渲染
    */
-  public static render(): boolean {
+  public static async render(): Promise<boolean> {
     let nan = Nan.getInstance();
     if (Date.now() - nan.lastUpdateTime > 30) {
-      this.update();
+      await this.update();
       return true;
     }
     return false;

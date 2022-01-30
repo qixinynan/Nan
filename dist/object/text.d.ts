@@ -5,5 +5,5 @@ export default class NText extends NanObject {
     color: string;
     autoUpdateWidth: boolean;
     constructor(transform: Transform, text: string, color?: string);
-    _update(): void;
+    _update(): Promise<void>;
 }

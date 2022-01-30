@@ -12,7 +12,7 @@ export default class NText extends NanObject {
     this.color = color;
   }
 
-  _update(): void { 
+  async _update() { 
     super._update();
     this.context.font = this.transform.size.y + "px serif";
 

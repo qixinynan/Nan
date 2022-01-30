@@ -17,5 +17,5 @@ export default class Polygon extends NanObject {
      * @param color 颜色
      */
     constructor(transform: Transform, angles: number, renderMethod?: string, color?: string);
-    _update(): void;
+    _update(): Promise<void>;
 }

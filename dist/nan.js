@@ -1,16 +1,3 @@
-/**
- * 二维数组
- */
-var Vector = /** @class */ (function () {
-    function Vector(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-    Vector.zero = new Vector(0, 0);
-    Vector.one = new Vector(1, 1);
-    return Vector;
-}());
-
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation.
 
@@ -41,6 +28,57 @@ function __extends(d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 }
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+}
+
+function __generator(thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+}
+
+/**
+ * 二维数组
+ */
+var Vector = /** @class */ (function () {
+    function Vector(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    Vector.zero = new Vector(0, 0);
+    Vector.one = new Vector(1, 1);
+    return Vector;
+}());
 
 var NanEvent = /** @class */ (function () {
     function NanEvent() {
@@ -210,25 +248,53 @@ var Nan = /** @class */ (function () {
      * 更新
      */
     Nan.update = function () {
-        var nan = Nan.getInstance();
-        nan.clear();
-        for (var i = 0; i < nan.objList.length; i++) {
-            var gameObj = nan.objList[i];
-            gameObj._update();
-        }
-        nan.lateUpdate();
-        nan.lastUpdateTime = Date.now();
+        return __awaiter(this, void 0, void 0, function () {
+            var nan, i, gameObj;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        nan = Nan.getInstance();
+                        nan.clear();
+                        i = 0;
+                        _a.label = 1;
+                    case 1:
+                        if (!(i < nan.objList.length)) return [3 /*break*/, 4];
+                        gameObj = nan.objList[i];
+                        return [4 /*yield*/, gameObj._update()];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3:
+                        i++;
+                        return [3 /*break*/, 1];
+                    case 4: return [4 /*yield*/, nan.lateUpdate()];
+                    case 5:
+                        _a.sent();
+                        nan.lastUpdateTime = Date.now();
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
     /**
      * 渲染
      */
     Nan.render = function () {
-        var nan = Nan.getInstance();
-        if (Date.now() - nan.lastUpdateTime > 30) {
-            this.update();
-            return true;
-        }
-        return false;
+        return __awaiter(this, void 0, void 0, function () {
+            var nan;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        nan = Nan.getInstance();
+                        if (!(Date.now() - nan.lastUpdateTime > 30)) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.update()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/, true];
+                    case 2: return [2 /*return*/, false];
+                }
+            });
+        });
     };
     /**
      * update执行后执行
@@ -319,7 +385,7 @@ var Transform = /** @class */ (function () {
     function Transform(position, rotation, size) {
         if (position === void 0) { position = Vector.zero; }
         if (rotation === void 0) { rotation = Vector.zero; }
-        if (size === void 0) { size = Vector.zero; }
+        if (size === void 0) { size = Vector.one; }
         this.position = Vector.zero; //位置
         this.rotation = Vector.zero; //角度 (未实现)
         this.size = Vector.zero; //缩放
@@ -351,27 +417,70 @@ var GameObject = /** @class */ (function () {
      *
      */
     GameObject.prototype._update = function () {
-        this.colliderStartPos = new Vector((this.transform.size.x - this.collider.x) / 2, (this.transform.size.y - this.collider.y) / 2);
-        if (this.update) {
-            var nanObjectList = this.update();
-            for (var i = 0; i < nanObjectList.length; i++) {
-                var nanObject = nanObjectList[i];
-                nanObject._update();
-            }
-        }
+        return __awaiter(this, void 0, void 0, function () {
+            var nanObjectList, i, nanObject;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.colliderStartPos = new Vector((this.transform.size.x - this.collider.x) / 2, (this.transform.size.y - this.collider.y) / 2);
+                        if (!this.update) return [3 /*break*/, 4];
+                        nanObjectList = this.update();
+                        i = 0;
+                        _a.label = 1;
+                    case 1:
+                        if (!(i < nanObjectList.length)) return [3 /*break*/, 4];
+                        nanObject = nanObjectList[i];
+                        return [4 /*yield*/, nanObject._update()];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3:
+                        i++;
+                        return [3 /*break*/, 1];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
     };
     GameObject.prototype.render = function () {
-        this._update();
-        this.lateUpdate();
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this._update()];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, this.lateUpdate()];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
     GameObject.prototype.lateUpdate = function () {
-        if (this.update) {
-            var nanObjectList = this.update();
-            for (var i = 0; i < nanObjectList.length; i++) {
-                var nanObject = nanObjectList[i];
-                nanObject._lateUpdate();
-            }
-        }
+        return __awaiter(this, void 0, void 0, function () {
+            var nanObjectList, i, nanObject;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!this.update) return [3 /*break*/, 4];
+                        nanObjectList = this.update();
+                        i = 0;
+                        _a.label = 1;
+                    case 1:
+                        if (!(i < nanObjectList.length)) return [3 /*break*/, 4];
+                        nanObject = nanObjectList[i];
+                        return [4 /*yield*/, nanObject._lateUpdate()];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3:
+                        i++;
+                        return [3 /*break*/, 1];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
     };
     GameObject.prototype.showColliderLine = function (color, lineWidth) {
         if (color === void 0) { color = "yellow"; }
@@ -432,17 +541,36 @@ var NanObject = /** @class */ (function () {
      * 内部帧更新函数
      */
     NanObject.prototype._update = function () {
-        if (this.update) {
-            this.update(this);
-        }
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                if (this.update) {
+                    this.update(this);
+                }
+                return [2 /*return*/];
+            });
+        });
     };
     NanObject.prototype._lateUpdate = function () {
-        if (this.lateUpdate) {
-            this.lateUpdate(this);
-        }
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                if (this.lateUpdate) {
+                    this.lateUpdate(this);
+                }
+                return [2 /*return*/];
+            });
+        });
     };
     NanObject.prototype.render = function () {
-        this._update();
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this._update()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
     NanObject.prototype.showFrameLine = function (color, lineWidth) {
         if (color === void 0) { color = "red"; }
@@ -487,8 +615,13 @@ var Sprite = /** @class */ (function (_super) {
      * 内部帧更新函数
      */
     Sprite.prototype._update = function () {
-        _super.prototype._update.call(this);
-        this.context.drawImage(this.image, this.transform.position.x, this.transform.position.y, this.transform.size.x, this.transform.size.y);
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                _super.prototype._update.call(this);
+                this.context.drawImage(this.image, this.transform.position.x, this.transform.position.y, this.transform.size.x, this.transform.size.y);
+                return [2 /*return*/];
+            });
+        });
     };
     /**
      * 设置图像
@@ -511,14 +644,20 @@ var NText = /** @class */ (function (_super) {
         return _this;
     }
     NText.prototype._update = function () {
-        _super.prototype._update.call(this);
-        this.context.font = this.transform.size.y + "px serif";
-        if (this.autoUpdateWidth) {
-            var textMesure = this.context.measureText(this.text);
-            this.transform.size.x = textMesure.width;
-        }
-        this.context.fillStyle = this.color;
-        this.context.fillText(this.text, this.transform.position.x, this.transform.position.y + this.transform.size.y);
+        return __awaiter(this, void 0, void 0, function () {
+            var textMesure;
+            return __generator(this, function (_a) {
+                _super.prototype._update.call(this);
+                this.context.font = this.transform.size.y + "px serif";
+                if (this.autoUpdateWidth) {
+                    textMesure = this.context.measureText(this.text);
+                    this.transform.size.x = textMesure.width;
+                }
+                this.context.fillStyle = this.color;
+                this.context.fillText(this.text, this.transform.position.x, this.transform.position.y + this.transform.size.y);
+                return [2 /*return*/];
+            });
+        });
     };
     return NText;
 }(NanObject));
@@ -532,7 +671,8 @@ var NLine = /** @class */ (function (_super) {
      */
     function NLine(transform, path, color) {
         if (color === void 0) { color = "black"; }
-        var _this = this;
+        var _this = _super.call(this, transform) || this;
+        _this.width = 1;
         if (path.x.x && path.x.y && path.y.x && path.y.y) {
             console.error("The variable path must be a Vector of Vector");
         }
@@ -544,12 +684,19 @@ var NLine = /** @class */ (function (_super) {
         return _this;
     }
     NLine.prototype._update = function () {
-        _super.prototype._update.call(this);
-        var pos = this.transform.position;
-        this.context.strokeStyle = this.color;
-        this.context.moveTo(this.path.x.x + pos.x, this.path.x.y + pos.y);
-        this.context.lineTo(this.path.y.x + pos.x, this.path.y.y + pos.y);
-        this.context.stroke();
+        return __awaiter(this, void 0, void 0, function () {
+            var pos;
+            return __generator(this, function (_a) {
+                _super.prototype._update.call(this);
+                pos = this.transform.position;
+                this.context.strokeStyle = this.color;
+                this.context.lineWidth = this.width;
+                this.context.moveTo(this.path.x.x + pos.x, this.path.x.y + pos.y);
+                this.context.lineTo(this.path.y.x + pos.x, this.path.y.y + pos.y);
+                this.context.stroke();
+                return [2 /*return*/];
+            });
+        });
     };
     return NLine;
 }(NanObject));
@@ -580,30 +727,36 @@ var Polygon = /** @class */ (function (_super) {
         return _this;
     }
     Polygon.prototype._update = function () {
-        _super.prototype._update.call(this);
-        this.context.lineWidth = this.lineWidth;
-        this.context.beginPath();
-        var ang = 2 * Math.PI / this.angles;
-        for (var i = 0; i < this.angles; i++) {
-            var x = Math.cos(ang * i + this.startAngles) * this.transform.size.x / 2 + this.transform.position.x + this.offsetX;
-            var y = Math.sin(ang * i + this.startAngles) * this.transform.size.y / 2 + this.transform.position.y + this.offsetY;
-            this.context.lineTo(x, y);
-        }
-        this.context.closePath();
-        switch (this.renderMethod) {
-            case "fill":
-                this.context.fillStyle = this.color;
-                this.context.strokeStyle = this.lineColor;
-                this.context.stroke();
-                this.context.fill();
-                break;
-            case "stroke":
-                this.context.strokeStyle = this.color;
-                this.context.stroke();
-                break;
-            default:
-                console.error("Unknow render way: %s", this.renderMethod);
-        }
+        return __awaiter(this, void 0, void 0, function () {
+            var ang, i, x, y;
+            return __generator(this, function (_a) {
+                _super.prototype._update.call(this);
+                this.context.lineWidth = this.lineWidth;
+                this.context.beginPath();
+                ang = 2 * Math.PI / this.angles;
+                for (i = 0; i < this.angles; i++) {
+                    x = Math.cos(ang * i + this.startAngles) * this.transform.size.x / 2 + this.transform.position.x + this.offsetX;
+                    y = Math.sin(ang * i + this.startAngles) * this.transform.size.y / 2 + this.transform.position.y + this.offsetY;
+                    this.context.lineTo(x, y);
+                }
+                this.context.closePath();
+                switch (this.renderMethod) {
+                    case "fill":
+                        this.context.fillStyle = this.color;
+                        this.context.strokeStyle = this.lineColor;
+                        this.context.stroke();
+                        this.context.fill();
+                        break;
+                    case "stroke":
+                        this.context.strokeStyle = this.color;
+                        this.context.stroke();
+                        break;
+                    default:
+                        console.error("Unknow render way: %s", this.renderMethod);
+                }
+                return [2 /*return*/];
+            });
+        });
     };
     return Polygon;
 }(NanObject));

@@ -35,7 +35,7 @@ export default class Polygon extends NanObject{
     this.offsetY = this.transform.size.x / 2;
   }
 
-  _update(): void {
+  async _update() {
     super._update();                  
     this.context.lineWidth = this.lineWidth;          
     this.context.beginPath();

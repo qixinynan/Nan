@@ -22,8 +22,8 @@ export default class NanObject {
     /**
      * 内部帧更新函数
      */
-    _update(): void;
-    _lateUpdate(): void;
-    render(): void;
+    _update(): Promise<void>;
+    _lateUpdate(): Promise<void>;
+    render(): Promise<void>;
     showFrameLine(color?: string, lineWidth?: number): void;
 }

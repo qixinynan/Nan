@@ -7,7 +7,7 @@ export default class Transform {
     position:Vector = Vector.zero; //位置
     rotation:Vector = Vector.zero; //角度 (未实现)
     size:Vector = Vector.zero; //缩放
-    constructor(position: Vector = Vector.zero, rotation: Vector = Vector.zero ,size: Vector = Vector.zero) {
+    constructor(position: Vector = Vector.zero, rotation: Vector = Vector.zero ,size: Vector = Vector.one) {
       this.position = position;
       this.rotation = rotation;
       this.size = size;

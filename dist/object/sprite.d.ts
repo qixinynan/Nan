@@ -16,7 +16,7 @@ export default class Sprite extends NanObject {
     /**
      * 内部帧更新函数
      */
-    _update(): void;
+    _update(): Promise<void>;
     /**
      * 设置图像
      * @param image 图像

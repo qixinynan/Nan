@@ -37,11 +37,11 @@ export default class Nan {
     /**
      * 更新
      */
-    static update(): void;
+    static update(): Promise<void>;
     /**
      * 渲染
      */
-    static render(): boolean;
+    static render(): Promise<boolean>;
     /**
      * update执行后执行
      */

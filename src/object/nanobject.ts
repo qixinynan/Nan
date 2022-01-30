@@ -34,20 +34,20 @@ export default class NanObject {
   /**
    * 内部帧更新函数
    */
-  _update() {
+  async _update() {
     if (this.update) {
       this.update(this);
     }
   }
 
-  _lateUpdate() {
+  async _lateUpdate() {
     if (this.lateUpdate) {
       this.lateUpdate(this);
     }
   }
 
-  render() {
-    this._update();
+  async render() {
+    await this._update();
   }
 
   showFrameLine(color: string = "red", lineWidth: number = 1) {

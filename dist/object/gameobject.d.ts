@@ -17,9 +17,9 @@ export default class GameObject {
      * Update会在每帧调用一次
      *
      */
-    _update(): void;
-    render(): void;
-    lateUpdate(): void;
+    _update(): Promise<void>;
+    render(): Promise<void>;
+    lateUpdate(): Promise<void>;
     showColliderLine(color?: string, lineWidth?: number): void;
     showFrameLine(color?: string, lineWidth?: number): void;
 }

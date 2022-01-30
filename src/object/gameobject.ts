@@ -31,7 +31,7 @@ export default class GameObject {
    * Update会在每帧调用一次
    *       
    */
-  _update(): void {
+  async _update() {
     this.colliderStartPos = new Vector(
       (this.transform.size.x - this.collider.x) / 2,
       (this.transform.size.y - this.collider.y) / 2,
@@ -40,22 +40,22 @@ export default class GameObject {
       const nanObjectList: NanObject[] = this.update();
       for (let i = 0; i < nanObjectList.length; i++) {
         const nanObject = nanObjectList[i];
-        nanObject._update();
+        await nanObject._update();
       }
     }
   }
 
-  render(): void {
-    this._update();
-    this.lateUpdate();
+  async render()  {
+    await this._update();
+    await this.lateUpdate();
   }
 
-  lateUpdate(): void {
+  async lateUpdate() {
     if (this.update) {
       const nanObjectList: NanObject[] = this.update();
       for (let i = 0; i < nanObjectList.length; i++) {
         const nanObject = nanObjectList[i];
-        nanObject._lateUpdate();
+        await nanObject._lateUpdate();
       }
     }
   }
