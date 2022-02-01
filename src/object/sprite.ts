@@ -25,15 +25,21 @@ export default class Sprite extends NanObject {
   /**
    * 内部帧更新函数
    */
-  async _update() {        
+  async _update() {
+    this.context.save();        
+    this.context.beginPath();
     super._update();
+
     this.context.drawImage(
       this.image,
       this.transform.position.x,
       this.transform.position.y,
       this.transform.size.x,
       this.transform.size.y
-    );        
+    );  
+
+    this.context.closePath();
+    this.context.restore();      
   }
 
   /**

@@ -383,15 +383,9 @@ var Nan$1 = Nan;
  */
 var Transform = /** @class */ (function () {
     function Transform(position, rotation, size) {
-        if (position === void 0) { position = Vector.zero; }
-        if (rotation === void 0) { rotation = Vector.zero; }
-        if (size === void 0) { size = Vector.one; }
-        this.position = Vector.zero; //位置
-        this.rotation = Vector.zero; //角度 (未实现)
-        this.size = Vector.zero; //缩放
-        this.position = position;
-        this.rotation = rotation;
-        this.size = size;
+        this.position = position ? position : Vector.zero;
+        this.rotation = rotation ? rotation : Vector.zero;
+        this.size = size ? size : Vector.one;
     }
     return Transform;
 }());
@@ -617,8 +611,12 @@ var Sprite = /** @class */ (function (_super) {
     Sprite.prototype._update = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
+                this.context.save();
+                this.context.beginPath();
                 _super.prototype._update.call(this);
                 this.context.drawImage(this.image, this.transform.position.x, this.transform.position.y, this.transform.size.x, this.transform.size.y);
+                this.context.closePath();
+                this.context.restore();
                 return [2 /*return*/];
             });
         });
@@ -647,6 +645,8 @@ var NText = /** @class */ (function (_super) {
         return __awaiter(this, void 0, void 0, function () {
             var textMesure;
             return __generator(this, function (_a) {
+                this.context.save();
+                this.context.beginPath();
                 _super.prototype._update.call(this);
                 this.context.font = this.transform.size.y + "px serif";
                 if (this.autoUpdateWidth) {
@@ -655,6 +655,8 @@ var NText = /** @class */ (function (_super) {
                 }
                 this.context.fillStyle = this.color;
                 this.context.fillText(this.text, this.transform.position.x, this.transform.position.y + this.transform.size.y);
+                this.context.closePath();
+                this.context.restore();
                 return [2 /*return*/];
             });
         });
@@ -687,6 +689,8 @@ var NLine = /** @class */ (function (_super) {
         return __awaiter(this, void 0, void 0, function () {
             var pos;
             return __generator(this, function (_a) {
+                this.context.save();
+                this.context.beginPath();
                 _super.prototype._update.call(this);
                 pos = this.transform.position;
                 this.context.strokeStyle = this.color;
@@ -694,6 +698,8 @@ var NLine = /** @class */ (function (_super) {
                 this.context.moveTo(this.path.x.x + pos.x, this.path.x.y + pos.y);
                 this.context.lineTo(this.path.y.x + pos.x, this.path.y.y + pos.y);
                 this.context.stroke();
+                this.context.closePath();
+                this.context.restore();
                 return [2 /*return*/];
             });
         });
@@ -730,9 +736,10 @@ var Polygon = /** @class */ (function (_super) {
         return __awaiter(this, void 0, void 0, function () {
             var ang, i, x, y;
             return __generator(this, function (_a) {
+                this.context.save();
+                this.context.beginPath();
                 _super.prototype._update.call(this);
                 this.context.lineWidth = this.lineWidth;
-                this.context.beginPath();
                 ang = 2 * Math.PI / this.angles;
                 for (i = 0; i < this.angles; i++) {
                     x = Math.cos(ang * i + this.startAngles) * this.transform.size.x / 2 + this.transform.position.x + this.offsetX;
@@ -744,8 +751,50 @@ var Polygon = /** @class */ (function (_super) {
                     case "fill":
                         this.context.fillStyle = this.color;
                         this.context.strokeStyle = this.lineColor;
-                        this.context.stroke();
                         this.context.fill();
+                        this.context.stroke();
+                        break;
+                    case "stroke":
+                        this.context.fillStyle = this.color;
+                        this.context.stroke();
+                        break;
+                    default:
+                        console.error("Unknow render way: %s", this.renderMethod);
+                }
+                this.context.closePath();
+                this.context.restore();
+                return [2 /*return*/];
+            });
+        });
+    };
+    return Polygon;
+}(NanObject));
+
+var Rect = /** @class */ (function (_super) {
+    __extends(Rect, _super);
+    function Rect(transform, renderMethod, color) {
+        if (renderMethod === void 0) { renderMethod = "fill"; }
+        if (color === void 0) { color = "black"; }
+        var _this = _super.call(this, transform) || this;
+        _this.lineColor = "yellow";
+        _this.lineWidth = 1;
+        _this.color = color;
+        _this.renderMethod = renderMethod;
+        return _this;
+    }
+    Rect.prototype._update = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                this.context.save();
+                this.context.beginPath();
+                _super.prototype._update.call(this);
+                this.context.rect(this.transform.position.x, this.transform.position.y, this.transform.size.x, this.transform.size.y);
+                switch (this.renderMethod) {
+                    case "fill":
+                        this.context.fillStyle = this.color;
+                        this.context.strokeStyle = this.lineColor;
+                        this.context.fill();
+                        this.context.stroke();
                         break;
                     case "stroke":
                         this.context.strokeStyle = this.color;
@@ -754,11 +803,13 @@ var Polygon = /** @class */ (function (_super) {
                     default:
                         console.error("Unknow render way: %s", this.renderMethod);
                 }
+                this.context.closePath();
+                this.context.restore();
                 return [2 /*return*/];
             });
         });
     };
-    return Polygon;
+    return Rect;
 }(NanObject));
 
 var Utils = /** @class */ (function () {
@@ -775,4 +826,4 @@ var Utils = /** @class */ (function () {
     return Utils;
 }());
 
-export { GameObject, NLine, NText, Nan$1 as Nan, NanObject, Polygon, Sprite, Transform, Utils, Vector };
+export { GameObject, NLine, NText, Nan$1 as Nan, NanObject, Polygon, Rect, Sprite, Transform, Utils, Vector };

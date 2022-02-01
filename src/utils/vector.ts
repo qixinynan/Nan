@@ -2,8 +2,8 @@
  * 二维数组
  */
 export default class Vector {
-    x:any;
-    y:any;
+    x: any;
+    y: any;
 
     constructor(x:any, y:any) {
       this.x = x;

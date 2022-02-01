@@ -1,6 +1,6 @@
 import NanObject from "./nanobject";
 import Vector from "../utils/vector";
-import Transform from "utils/transform";
+import Transform from "../utils/transform";
 
 export default class NLine extends NanObject {
   public path: Vector;
@@ -24,13 +24,19 @@ export default class NLine extends NanObject {
     this.color = color;
   }
 
-  async _update() {     
+  async _update() {    
+    this.context.save();
+    this.context.beginPath();
     super._update();
+
     let pos: Vector = this.transform.position;
     this.context.strokeStyle = this.color;
     this.context.lineWidth = this.width;
     this.context.moveTo(this.path.x.x + pos.x, this.path.x.y + pos.y);
     this.context.lineTo(this.path.y.x + pos.x, this.path.y.y + pos.y);
-    this.context.stroke();        
+    this.context.stroke(); 
+    
+    this.context.closePath();
+    this.context.restore();
   }
 }

@@ -1,4 +1,3 @@
-import { Vector } from "index";
 import Transform from "utils/transform";
 import NanObject from "./nanobject";
 
@@ -25,7 +24,7 @@ export default class Polygon extends NanObject{
    * @param renderMethod 绘制方法 fill为实心 stroke为描边
    * @param color 颜色
    */
-  constructor(transform: Transform, angles: number ,renderMethod: string = "fill", color: string = "#000000"){
+  constructor(transform: Transform, angles: number ,renderMethod: string = "fill", color: string = "#000000"){    
     super(transform);
     this.angles = angles;
     this.renderMethod = renderMethod;
@@ -36,9 +35,11 @@ export default class Polygon extends NanObject{
   }
 
   async _update() {
-    super._update();                  
-    this.context.lineWidth = this.lineWidth;          
+    this.context.save();
     this.context.beginPath();
+    super._update();         
+
+    this.context.lineWidth = this.lineWidth;              
     let ang: number = 2 * Math.PI / this.angles;
 
     for (let i = 0; i < this.angles ; i++) {
@@ -46,22 +47,24 @@ export default class Polygon extends NanObject{
       let y:number = Math.sin(ang * i + this.startAngles) * this.transform.size.y / 2 + this.transform.position.y + this.offsetY;                  
       this.context.lineTo(x,y);            
     }
-
-    this.context.closePath();
-    
+     
+    this.context.closePath(); 
     switch (this.renderMethod) {
-      case "fill":
+      case "fill":        
         this.context.fillStyle = this.color;
-        this.context.strokeStyle = this.lineColor;     
-        this.context.stroke();   
-        this.context.fill();
+        this.context.strokeStyle = this.lineColor;             
+        this.context.fill();        
+        this.context.stroke();                
         break;
       case "stroke":        
-        this.context.strokeStyle = this.color;
+        this.context.fillStyle = this.color;
         this.context.stroke();
         break;
       default:
         console.error("Unknow render way: %s", this.renderMethod);  
     }    
+    
+    this.context.closePath(); 
+    this.context.restore();        
   }
 }

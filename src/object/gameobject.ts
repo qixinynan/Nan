@@ -40,7 +40,7 @@ export default class GameObject {
       const nanObjectList: NanObject[] = this.update();
       for (let i = 0; i < nanObjectList.length; i++) {
         const nanObject = nanObjectList[i];
-        await nanObject._update();
+        await nanObject._update();  
       }
     }
   }

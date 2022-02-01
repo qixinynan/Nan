@@ -7,6 +7,7 @@ import Sprite from './object/sprite'
 import NText from './object/text'
 import NLine from './object/line'
 import Polygon from './object/polygon'
+import Rect from './object/rect'
 
 //utils
 import Vector from './utils/vector'
@@ -15,7 +16,7 @@ import Utils from './utils/utils'
 
 export {
   Nan, //framework
-  GameObject,NanObject, //base
-  Sprite,NText,NLine,Polygon, //object
-  Utils,Vector,Transform //utils
+  GameObject, NanObject, //base
+  Sprite, NText, NLine, Polygon, Rect, //object
+  Utils, Vector, Transform //utils
 }

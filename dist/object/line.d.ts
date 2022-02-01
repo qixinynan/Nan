@@ -1,6 +1,6 @@
 import NanObject from "./nanobject";
 import Vector from "../utils/vector";
-import Transform from "utils/transform";
+import Transform from "../utils/transform";
 export default class NLine extends NanObject {
     path: Vector;
     color: string;
