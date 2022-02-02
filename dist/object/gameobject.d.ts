@@ -10,7 +10,7 @@ export default class GameObject {
     collider: Vector<number>;
     colliderStartPos: Vector<number>;
     objects: NanObject[];
-    onClick: (() => undefined | undefined) | undefined;
+    onClick: (() => void | undefined) | undefined;
     init: (() => void) | undefined;
     constructor(name: string, transform?: Transform);
     beforeUpdate(): void;

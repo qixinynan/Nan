@@ -18,7 +18,7 @@ export default class GameObject {
 
   public objects: NanObject[] = [];
 
-  public onClick: (() => undefined | undefined) | undefined;
+  public onClick: (() => void | undefined) | undefined;
 
   public init: (() => void) | undefined;
 
