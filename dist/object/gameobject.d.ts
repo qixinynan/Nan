@@ -7,8 +7,8 @@ import NanObject from "./nanobject";
 export default class GameObject {
     name: string;
     transform: Transform;
-    collider: Vector;
-    colliderStartPos: Vector;
+    collider: Vector<number>;
+    colliderStartPos: Vector<number>;
     onClick: Function | undefined;
     update: (() => NanObject[]) | undefined;
     constructor(name: string, transform?: Transform);

@@ -675,9 +675,6 @@ var NLine = /** @class */ (function (_super) {
         if (color === void 0) { color = "black"; }
         var _this = _super.call(this, transform) || this;
         _this.width = 1;
-        if (path.x.x && path.x.y && path.y.x && path.y.y) {
-            console.error("The variable path must be a Vector of Vector");
-        }
         transform.size.x = Math.abs(path.x.x - path.y.x);
         transform.size.y = Math.abs(path.x.y - path.y.y);
         _this = _super.call(this, transform) || this;

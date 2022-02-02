@@ -1,11 +1,11 @@
 /**
  * 二维数组
  */
-export default class Vector {
-    x: any;
-    y: any;
+export default class Vector<T> {
+    x: T;
+    y: T;
 
-    constructor(x:any, y:any) {
+    constructor(x: T, y: T) {
       this.x = x;
       this.y = y;
     }

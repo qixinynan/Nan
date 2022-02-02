@@ -10,8 +10,8 @@ import NanObject from "./nanobject";
 export default class GameObject {
   public name: string;
   public transform: Transform; //变换信息
-  public collider: Vector;
-  public colliderStartPos: Vector = new Vector(0, 0);
+  public collider: Vector<number>;
+  public colliderStartPos: Vector<number> = new Vector(0, 0);
   public onClick: Function | undefined;
   //渲染回调函数，渲染请在该函数操作
   public update: (() => NanObject[]) | undefined;
@@ -63,8 +63,8 @@ export default class GameObject {
   showColliderLine(color: string = "yellow", lineWidth: number = 1) {
 
     let context: CanvasRenderingContext2D = Nan.getInstance().getContext();
-    let originPos: Vector = new Vector(this.transform.position.x + this.colliderStartPos.x, this.transform.position.y + this.colliderStartPos.y);
-    let size: Vector = this.collider;
+    let originPos: Vector<number> = new Vector(this.transform.position.x + this.colliderStartPos.x, this.transform.position.y + this.colliderStartPos.y);
+    let size: Vector<number> = this.collider;
     context.lineWidth = lineWidth;
 
     context.moveTo(originPos.x, originPos.y);
@@ -79,8 +79,8 @@ export default class GameObject {
   showFrameLine(color: string = "blue", lineWidth: number = 1) {
 
     let context: CanvasRenderingContext2D = Nan.getInstance().getContext();
-    let originPos: Vector = new Vector(this.transform.position.x, this.transform.position.y);
-    let size: Vector = this.transform.size;
+    let originPos: Vector<number> = new Vector(this.transform.position.x, this.transform.position.y);
+    let size: Vector<number> = this.transform.size;
     context.lineWidth = lineWidth;
 
     context.moveTo(originPos.x, originPos.y);

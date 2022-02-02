@@ -5,8 +5,8 @@ export default class Nan {
     private fps;
     private eventManager;
     private lastUpdateTime;
-    originPosition: Vector;
-    originScale: Vector;
+    originPosition: Vector<number>;
+    originScale: Vector<number>;
     context: CanvasRenderingContext2D;
     objList: Array<GameObject>;
     canvasDraggable: boolean;

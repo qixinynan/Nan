@@ -3,7 +3,7 @@ import Vector from "../utils/vector";
 import Transform from "../utils/transform";
 
 export default class NLine extends NanObject {
-  public path: Vector;
+  public path: Vector<Vector<number>>;
   public color: string;
   public width: number = 1;
   
@@ -12,11 +12,8 @@ export default class NLine extends NanObject {
    * @param transform 变换信息
    * @param path 线段路径信息，必须要一个二维数组（Vector）的二维数组。path.x为起始点,path.y为结束点
    */
-  constructor(transform: Transform, path: Vector, color: string = "black"){
-    super(transform);
-    if(path.x.x && path.x.y && path.y.x && path.y.y) {
-      console.error("The variable path must be a Vector of Vector")
-    }
+  constructor(transform: Transform, path: Vector<Vector<number>>, color: string = "black"){
+    super(transform);        
     transform.size.x = Math.abs(path.x.x - path.y.x)
     transform.size.y = Math.abs(path.x.y - path.y.y);
     super(transform);    
@@ -29,7 +26,7 @@ export default class NLine extends NanObject {
     this.context.beginPath();
     super._update();
 
-    let pos: Vector = this.transform.position;
+    let pos: Vector<number> = this.transform.position;
     this.context.strokeStyle = this.color;
     this.context.lineWidth = this.width;
     this.context.moveTo(this.path.x.x + pos.x, this.path.x.y + pos.y);

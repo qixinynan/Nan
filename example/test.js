@@ -18,9 +18,9 @@ class TestObject extends GameObject {
   }
 }
 
-// const obbbbb = new TestObject('BBBB');
-// nan.add(obbbbb);
-// Nan.render().then(() => console.log("then"));
+const obbbbb = new TestObject('BBBB');
+nan.add(obbbbb);
+Nan.render().then(() => console.log("then"));
 Nan.render();
 
 

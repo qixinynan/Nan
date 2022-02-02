@@ -51,8 +51,8 @@ export default class NanObject {
   }
 
   showFrameLine(color: string = "red", lineWidth: number = 1) {
-    let originPos: Vector = this.transform.position;
-    let size: Vector = this.transform.size;
+    let originPos: Vector<number> = this.transform.position;
+    let size: Vector<number> = this.transform.size;
 
     this.context.lineWidth = lineWidth;
 

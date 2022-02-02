@@ -11,8 +11,8 @@ export default class Nan {
   private eventManager: EventManager = new EventManager();
   private lastUpdateTime: number = 0;
 
-  public originPosition: Vector = new Vector(0, 0);
-  public originScale: Vector = new Vector(1, 1);
+  public originPosition: Vector<number> = new Vector(0, 0);
+  public originScale: Vector<number> = new Vector(1, 1);
   public context: CanvasRenderingContext2D; //Canvas渲染器
   public objList: Array<GameObject> = []; //已加载的物体列表
   public canvasDraggable: boolean = true; //画布可否可拖拽

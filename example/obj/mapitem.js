@@ -1,5 +1,5 @@
 import MapManager from "../manager/mapmanager.js";
-import { Nan, GameObject, Polygon, Transform, Vector, Rect } from "../../dist/nan.js";
+import { Nan, GameObject, Polygon, Transform, Vector, Rect, NLine } from "../../dist/nan.js";
 
 export default class MapItem extends GameObject {
   bc = 50;
@@ -28,6 +28,13 @@ export default class MapItem extends GameObject {
       this.setHeightColor();
       this.phy.lateUpdate = undefined;
     }        
+    
+    // const line = new NLine(new Transform(), new Vector(new Vector(0 ,0), new Vector(100, 100)))
+    // line.width = 100;
+    // line.lateUpdate = ()=>{
+    //   line.showFrameLine();
+    // }    
+    // line.render();
     return [this.phy];
   }
 
