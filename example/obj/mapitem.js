@@ -30,6 +30,7 @@ export default class MapItem extends GameObject {
       this.phy.updated = () => {
         // console.log("I'M IN LATEUPDATE");
         this.phy.lineColor = 'yellow';
+        this.phy.color = "green";
         this.phy.update();
       };
     } else {

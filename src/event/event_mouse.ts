@@ -38,15 +38,16 @@ export default class EventMouse extends NanEvent {
       const x = e.clientX - canvasBound.left;
       const y = e.clientY - canvasBound.top;
       const xOffset = x - obj.transform.position.x * scale
-      - obj.colliderStartPos.x * scale + nan.originPosition.x;
+        - obj.colliderStartPos.x * scale + nan.originPosition.x;
       const yOffset = y - obj.transform.position.y * scale
-      - obj.colliderStartPos.y * scale + nan.originPosition.y;
+        - obj.colliderStartPos.y * scale + nan.originPosition.y;
       if (
         yOffset >= 0
         && xOffset >= 0
         && xOffset <= obj.collider.x * scale
         && yOffset <= obj.collider.y * scale
       ) {
+        nan.selectedObj = obj;
         if (obj.onClick) {
           obj.onClick();
         }

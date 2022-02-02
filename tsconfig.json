@@ -11,6 +11,7 @@
     "strict": true, /* Enable all strict type-checking options. */
     "skipLibCheck": true,
     "moduleResolution": "node",
-    "sourceMap": true
+    "sourceMap": true,
+    "target":"es6"
   }
 }

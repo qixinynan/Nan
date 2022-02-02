@@ -6,8 +6,7 @@ export default class NLine extends NanObject {
   public path: Vector<Vector<number>>;
 
   public color: string;
-
-  public width = 1;
+  public width: number = 1;
 
   /**
    *
@@ -18,7 +17,6 @@ export default class NLine extends NanObject {
     super(transform);
     this.transform.size.x = Math.abs(path.x.x - path.y.x);
     this.transform.size.y = Math.abs(path.x.y - path.y.y);
-    super(transform);
     this.path = path;
     this.color = color;
   }

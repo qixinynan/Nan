@@ -1,119 +1,84 @@
 /**
  * 二维数组
  */
-var Vector = /** @class */ (function () {
-    function Vector(x, y) {
+class Vector {
+    constructor(x, y) {
         this.x = x;
         this.y = y;
     }
-    Vector.zero = new Vector(0, 0);
-    Vector.one = new Vector(1, 1);
-    return Vector;
-}());
+}
+Vector.zero = new Vector(0, 0);
+Vector.one = new Vector(1, 1);
 
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation.
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
-***************************************************************************** */
-/* global Reflect, Promise */
-
-var extendStatics = function(d, b) {
-    extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-    return extendStatics(d, b);
-};
-
-function __extends(d, b) {
-    if (typeof b !== "function" && b !== null)
-        throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-    extendStatics(d, b);
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+class NanEvent {
+    constructor() {
+        this.nan = Nan.getInstance();
+    }
 }
 
-var NanEvent = /** @class */ (function () {
-    function NanEvent() {
-        this.nan = Nan$1.getInstance();
-    }
-    return NanEvent;
-}());
-
-var EventMouse = /** @class */ (function (_super) {
-    __extends(EventMouse, _super);
-    function EventMouse() {
-        var _this = _super.call(this) || this;
+class EventMouse extends NanEvent {
+    constructor() {
+        super();
         // TODO EventMouse使用了太多Nan的参数，耦合太高了
-        _this.isDraging = false;
-        _this.isMouseDown = false;
-        var canvas = _this.nan.getContext().canvas;
-        canvas.onmouseup = _this.onClick;
-        canvas.onmousedown = _this.onMouseDown;
+        this.isDraging = false;
+        this.isMouseDown = false;
+        const { canvas } = this.nan.getContext();
+        canvas.onmouseup = this.onClick;
+        canvas.onmousedown = this.onMouseDown;
         canvas.onwheel = EventMouse.onWheel;
-        canvas.oncontextmenu = function (e) {
+        canvas.oncontextmenu = (e) => {
             e.preventDefault();
         };
-        return _this;
     }
-    EventMouse.prototype.onClick = function (e) {
-        var nan = Nan$1.getInstance();
+    onClick(e) {
+        const nan = Nan.getInstance();
         this.isMouseDown = false;
         if (this.isDraging) {
             this.isDraging = false;
             return;
         }
         this.isDraging = false;
-        var scale = nan.scale;
-        var canvasBound = nan.context.canvas.getBoundingClientRect();
-        for (var i = 0; i < nan.objList.length; i += 1) {
-            var obj = nan.objList[i];
-            var x = e.clientX - canvasBound.left;
-            var y = e.clientY - canvasBound.top;
-            var xOffset = x - obj.transform.position.x * scale
+        const { scale } = nan;
+        const canvasBound = nan.context.canvas.getBoundingClientRect();
+        for (let i = 0; i < nan.objList.length; i += 1) {
+            const obj = nan.objList[i];
+            const x = e.clientX - canvasBound.left;
+            const y = e.clientY - canvasBound.top;
+            const xOffset = x - obj.transform.position.x * scale
                 - obj.colliderStartPos.x * scale + nan.originPosition.x;
-            var yOffset = y - obj.transform.position.y * scale
+            const yOffset = y - obj.transform.position.y * scale
                 - obj.colliderStartPos.y * scale + nan.originPosition.y;
             if (yOffset >= 0
                 && xOffset >= 0
                 && xOffset <= obj.collider.x * scale
                 && yOffset <= obj.collider.y * scale) {
+                nan.selectedObj = obj;
                 if (obj.onClick) {
                     obj.onClick();
                 }
             }
         }
-    };
+    }
     /**
      * 按下事件处理
      */
     // TODO client坐标在canvas坐标变更后可能失效
-    EventMouse.prototype.onMouseDown = function (de) {
-        var _this = this;
-        var nan = Nan$1.getInstance();
-        var canvas = nan.getContext().canvas;
-        var lastPos = new Vector(de.clientX, de.clientY);
+    onMouseDown(de) {
+        const nan = Nan.getInstance();
+        const { canvas } = nan.getContext();
+        let lastPos = new Vector(de.clientX, de.clientY);
         this.isMouseDown = true;
         // console.log(de.clientX, de.clientY);
-        canvas.onmousemove = function (e) {
-            if (_this.isMouseDown) {
+        canvas.onmousemove = (e) => {
+            if (this.isMouseDown) {
                 if (nan.canvasDraggable && (e.buttons === 2 || e.buttons === 1)) {
-                    var dragX = e.clientX - lastPos.x;
-                    var dragY = e.clientY - lastPos.y;
+                    let dragX = e.clientX - lastPos.x;
+                    let dragY = e.clientY - lastPos.y;
                     if (Math.abs(dragX) < 5 && Math.abs(dragY) < 5) {
-                        _this.isDraging = false;
+                        this.isDraging = false;
                         return;
                     }
-                    _this.isDraging = true;
+                    this.isDraging = true;
                     dragX /= nan.scale;
                     dragY /= nan.scale;
                     nan.translateOrigin(dragX, dragY);
@@ -121,45 +86,41 @@ var EventMouse = /** @class */ (function (_super) {
                 }
             }
         };
-        canvas.onmouseout = function () {
-            _this.isMouseDown = false;
-            if (_this.isDraging) {
-                _this.isDraging = false;
+        canvas.onmouseout = () => {
+            this.isMouseDown = false;
+            if (this.isDraging) {
+                this.isDraging = false;
             }
         };
-    };
+    }
     /**
      * 监听滚轮事件
      * 缩放功能
      */
-    EventMouse.onWheel = function (e) {
-        var nan = Nan$1.getInstance();
+    static onWheel(e) {
+        const nan = Nan.getInstance();
         if (e.deltaY > 0) {
             nan.scaleOrigin(0.8);
         }
         else {
             nan.scaleOrigin(1.2);
         }
-    };
-    return EventMouse;
-}(NanEvent));
-
-var EventManager = /** @class */ (function () {
-    function EventManager() {
     }
-    EventManager.prototype.init = function () {
-        this.eventMouse = new EventMouse();
-    };
-    return EventManager;
-}());
+}
 
-var Nan = /** @class */ (function () {
+class EventManager {
+    init() {
+        this.eventMouse = new EventMouse();
+    }
+}
+
+class Nan {
     /**
      *  构造函数初始化
      * @param canvas Canvas对象
      * @param fps 刷新帧率
      */
-    function Nan(canvas) {
+    constructor(canvas) {
         this.fps = 30; // 帧率
         this.eventManager = new EventManager();
         this.lastUpdateTime = 0;
@@ -185,126 +146,125 @@ var Nan = /** @class */ (function () {
     /**
    * 初始化
    */
-    Nan.prototype.init = function () {
+    init() {
         this.eventManager.init();
         if (this.autoUpdate) {
             setInterval(Nan.update, 1000 / this.fps);
         }
-    };
+    }
     /**
      * 获取单例
      * @returns 单例
      */
-    Nan.getInstance = function () {
+    static getInstance() {
         return Nan.instance;
-    };
+    }
     /**
      * 获取Canvas渲染器
      * @returns Canvas渲染器
      */
-    Nan.prototype.getContext = function () {
+    getContext() {
         return this.context;
-    };
+    }
     // 清屏
-    Nan.clear = function () {
-        var nan = Nan.getInstance();
-        var cleanX = nan.originPosition.x / nan.scale;
-        var cleanY = nan.originPosition.y / nan.scale;
-        var canvasWidth = nan.context.canvas.width;
-        var canvasHeight = nan.context.canvas.height;
+    static clear() {
+        const nan = Nan.getInstance();
+        const cleanX = nan.originPosition.x / nan.scale;
+        const cleanY = nan.originPosition.y / nan.scale;
+        const canvasWidth = nan.context.canvas.width;
+        const canvasHeight = nan.context.canvas.height;
         nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x, canvasHeight / nan.originScale.y); // 清屏
-    };
+    }
     /**
      * 更新
      */
-    Nan.update = function () {
-        var nan = Nan.getInstance();
+    static update() {
+        const nan = Nan.getInstance();
         Nan.clear();
-        for (var i = 0; i < nan.objList.length; i += 1) {
-            var gameObject = nan.objList[i];
+        for (let i = 0; i < nan.objList.length; i += 1) {
+            const gameObject = nan.objList[i];
             gameObject.beforeUpdate();
             gameObject.updateNanObjects();
         }
         nan.lastUpdateTime = Date.now();
-    };
+    }
     /**
      * update执行后执行
      */
-    Nan.updated = function () {
-        var nan = Nan.getInstance();
-        for (var i = 0; i < nan.objList.length; i += 1) {
-            var gameObject = nan.objList[i];
+    static updated() {
+        const nan = Nan.getInstance();
+        for (let i = 0; i < nan.objList.length; i += 1) {
+            const gameObject = nan.objList[i];
             gameObject.updated();
         }
-    };
+    }
     /**
      * 渲染
      */
-    Nan.render = function () {
-        var nan = Nan.getInstance();
+    static render() {
+        const nan = Nan.getInstance();
         if (Date.now() - nan.lastUpdateTime > 30) {
             this.update();
             this.updated();
             return true;
         }
         return false;
-    };
+    }
     /**
      * 添加GameObject对象
      * @param obj GameObject对象
      */
-    Nan.prototype.add = function (obj, autoUpdate) {
-        if (autoUpdate === void 0) { autoUpdate = true; }
+    add(obj, autoUpdate = true) {
         if (!obj.update) {
             console.warn("The gameobject named %s hasn't return any NanObject in update()", obj.name);
         }
         this.objList.push(obj);
-        if (autoUpdate) {
+        if (!autoUpdate) {
             Nan.render();
         }
-    };
+    }
     /**
      * 查询Nan对象
      * @param name 名称
      * @returns Nan对象
      */
-    Nan.prototype.findGameObject = function (name) {
-        var result = null;
-        for (var i = 0; i < this.objList.length; i += 1) {
-            var obj = this.objList[i];
+    findGameObject(name) {
+        let result = null;
+        for (let i = 0; i < this.objList.length; i += 1) {
+            const obj = this.objList[i];
             if (obj.name === name) {
                 result = obj;
             }
         }
         return result;
-    };
+    }
     /**
      * 移动坐标原点并记录
      * @param x x
      * @param y y
      */
-    Nan.prototype.translateOrigin = function (x, y) {
+    translateOrigin(x, y) {
         this.context.translate(x, y);
         this.originPosition = new Vector(this.originPosition.x - x * this.scale, this.originPosition.y - y * this.scale);
         if (!this.autoUpdate) {
             Nan.render();
         }
-    };
+    }
     /**
      * 移动“到”坐标原点并记录
      * @param x x
      * @param y x
      */
-    Nan.prototype.moveOrigin = function (x, y) {
+    moveOrigin(x, y) {
         this.translateOrigin(this.originPosition.x + x, this.originPosition.y + y);
-    };
+    }
     /**
      * 缩放画布
      * @param x x
      * @param y x
      */
     // TODO 以中心缩放
-    Nan.prototype.scaleOrigin = function (x) {
+    scaleOrigin(x) {
         if (this.scale < 0.1 && x < 1)
             return;
         if (this.scale > 3 && x > 1)
@@ -315,31 +275,76 @@ var Nan = /** @class */ (function () {
         if (!this.autoUpdate) {
             Nan.render();
         }
-    };
-    return Nan;
-}());
-var Nan$1 = Nan;
+    }
+}
+// scaleOrigin(scaleBy: number) {
+//   if (this.scale < 0.1 && scaleBy < 1) return;
+//   if (this.scale > 3 && scaleBy > 1) return;
+//   this.scale *= scaleBy;
+//   let canvas = this.getContext().canvas;
+//   var canvasBound = this.context.canvas.getBoundingClientRect()
+//   // this.scale *= scaleBy;
+//   console.log(this.scale)
+//   // this.scaleAt(this.originScale.x / 2, this.originScale.y / 2, x);
+//   this.context.scale(scaleBy, scaleBy);
+//   this.originScale = new Vector(this.originScale.x * scaleBy, this.originScale.y * scaleBy);
+//   // if (this.selectedObj) {
+//   //   let screenpos = this.toScreen(this.selectedObj.transform.position.x, this.selectedObj.transform.position.y);
+//   let xcenter = canvasBound.width / 2;
+//   let ycenter = canvasBound.height / 2;
+//   //   let screendiffx = 0;
+//   //   let screendiffy = 0;
+//   //   if(screenpos.x<0){
+//   //     screendiffx = -screenpos.x;
+//   //   }
+//   //   if(screenpos.x<0 || screenpos.x>canvasBound.width){
+//   //     screendiffx = -screenpos.x;
+//   //   }
+//   let centerWorldPos = this.toWorld(xcenter, ycenter);
+//   let x1 = centerWorldPos.x - (centerWorldPos.x - this.originPosition.x) * this.scale;
+//   let y1 = centerWorldPos.x - (centerWorldPos.x - this.originPosition.x) * this.scale;
+//   let diffx = (x1 - this.originPosition.x);
+//   let diffy = (y1 - this.originPosition.y);
+//   //   //   let diffy = (canvasBound.height / 2 + y1) / this.scale;
+//   //   // console.log(this.originPosition, this.selectedObj.transform.position, x1, y1, diffx, diffy)
+//   //   console.log(this.originPosition, this.selectedObj.transform.position, centerWorldPos, diffx, diffy)
+//   // this.translateOrigin(diffx, diffy);
+//   this.context.translate(-diffx, -diffy);
+//   this.originPosition = new Vector(this.originPosition.x + diffx * this.scale, this.originPosition.y + diffy * this.scale);
+//   // }
+//   if (!this.autoUpdate) {
+//     Nan.render();
+//   }
+// }
+// toWorld(x: number, y: number) {  // convert to world coordinates
+//   x = (x - this.originPosition.x) / this.scale;
+//   y = (y - this.originPosition.y) / this.scale;
+//   return { x, y };
+// }
+// toScreen(x: number, y: number) {
+//   x = x * this.scale + this.originPosition.x;
+//   y = y * this.scale + this.originPosition.y;
+//   return { x, y };
+// }
 
 /**
  * 变换信息
  * 变换信息类中保存的物体的位置和旋转角度等信息
  */
-var Transform = /** @class */ (function () {
-    function Transform(position, rotation, size) {
+class Transform {
+    constructor(position, rotation, size) {
         this.position = position || Vector.zero;
         this.rotation = rotation || Vector.zero;
         this.size = size || Vector.one;
     }
-    return Transform;
-}());
+}
 
 /* eslint-disable @typescript-eslint/no-empty-function */
 /**
 * NanObject是Nan框架的基石。任何能够在Canvas上看得见的东西都应当是GameObject的派生类
 */
-var GameObject = /** @class */ (function () {
-    function GameObject(name, transform) {
-        if (transform === void 0) { transform = new Transform(Vector.zero, Vector.zero, Vector.zero); }
+class GameObject {
+    constructor(name, transform = new Transform(Vector.zero, Vector.zero, Vector.zero)) {
         this.colliderStartPos = new Vector(0, 0);
         this.objects = [];
         if (!name) {
@@ -352,40 +357,38 @@ var GameObject = /** @class */ (function () {
             this.init();
         }
     }
-    GameObject.prototype.beforeUpdate = function () { };
-    GameObject.prototype.update = function () {
+    beforeUpdate() { }
+    update() {
         this.setCollider();
-    };
-    GameObject.prototype.updateNanObjects = function () {
-        var updateResult = this.update();
+    }
+    updateNanObjects() {
+        const updateResult = this.update();
         if (updateResult) {
             this.objects = updateResult;
         }
-        for (var i = 0; i < this.objects.length; i += 1) {
-            var nanObject = this.objects[i];
+        for (let i = 0; i < this.objects.length; i += 1) {
+            const nanObject = this.objects[i];
             nanObject.update();
         }
-    };
-    GameObject.prototype.updated = function () {
-        for (var i = 0; i < this.objects.length; i += 1) {
-            var nanObject = this.objects[i];
+    }
+    updated() {
+        for (let i = 0; i < this.objects.length; i += 1) {
+            const nanObject = this.objects[i];
             nanObject.updated();
         }
-    };
-    GameObject.prototype.render = function () {
+    }
+    render() {
         this.beforeUpdate();
         this.updateNanObjects();
         this.updated();
-    };
-    GameObject.prototype.setCollider = function () {
+    }
+    setCollider() {
         this.colliderStartPos = new Vector((this.transform.size.x - this.collider.x) / 2, (this.transform.size.y - this.collider.y) / 2);
-    };
-    GameObject.prototype.showColliderLine = function (color, lineWidth) {
-        if (color === void 0) { color = 'yellow'; }
-        if (lineWidth === void 0) { lineWidth = 1; }
-        var context = Nan$1.getInstance().getContext();
-        var originPos = new Vector(this.transform.position.x + this.colliderStartPos.x, this.transform.position.y + this.colliderStartPos.y);
-        var size = this.collider;
+    }
+    showColliderLine(color = 'yellow', lineWidth = 1) {
+        const context = Nan.getInstance().getContext();
+        const originPos = new Vector(this.transform.position.x + this.colliderStartPos.x, this.transform.position.y + this.colliderStartPos.y);
+        const size = this.collider;
         context.lineWidth = lineWidth;
         context.moveTo(originPos.x, originPos.y);
         context.lineTo(originPos.x + size.x, originPos.y);
@@ -394,13 +397,11 @@ var GameObject = /** @class */ (function () {
         context.lineTo(originPos.x, originPos.y);
         context.strokeStyle = color;
         context.stroke();
-    };
-    GameObject.prototype.showFrameLine = function (color, lineWidth) {
-        if (color === void 0) { color = 'blue'; }
-        if (lineWidth === void 0) { lineWidth = 1; }
-        var context = Nan$1.getInstance().getContext();
-        var originPos = new Vector(this.transform.position.x, this.transform.position.y);
-        var size = this.transform.size;
+    }
+    showFrameLine(color = 'blue', lineWidth = 1) {
+        const context = Nan.getInstance().getContext();
+        const originPos = new Vector(this.transform.position.x, this.transform.position.y);
+        const { size } = this.transform;
         context.lineWidth = lineWidth;
         context.moveTo(originPos.x, originPos.y);
         context.lineTo(originPos.x + size.x, originPos.y);
@@ -409,35 +410,32 @@ var GameObject = /** @class */ (function () {
         context.lineTo(originPos.x, originPos.y);
         context.strokeStyle = color;
         context.stroke();
-    };
-    return GameObject;
-}());
+    }
+}
 
 /**
  * NanObject是GameObject框架的基石。是GameObject每次Update返回给Nan的就是NanObject的列表
  */
-var NanObject = /** @class */ (function () {
+class NanObject {
     /**
      * 构造初始化
      * @param transform 变换信息
      */
-    function NanObject(transform) {
+    constructor(transform) {
         this.transform = transform;
-        this.context = Nan$1.getInstance().getContext();
+        this.context = Nan.getInstance().getContext();
     }
-    NanObject.prototype.beforeUpdate = function () { };
-    NanObject.prototype.update = function () { };
-    NanObject.prototype.updated = function () { };
-    NanObject.prototype.render = function () {
+    beforeUpdate() { }
+    update() { }
+    updated() { }
+    render() {
         this.beforeUpdate();
         this.update();
         this.updated();
-    };
-    NanObject.prototype.showFrameLine = function (color, lineWidth) {
-        if (color === void 0) { color = 'red'; }
-        if (lineWidth === void 0) { lineWidth = 1; }
-        var originPos = this.transform.position;
-        var size = this.transform.size;
+    }
+    showFrameLine(color = 'red', lineWidth = 1) {
+        const originPos = this.transform.position;
+        const { size } = this.transform;
         this.context.lineWidth = lineWidth;
         this.context.moveTo(originPos.x, originPos.y);
         this.context.lineTo(originPos.x + size.x, originPos.y);
@@ -446,105 +444,92 @@ var NanObject = /** @class */ (function () {
         this.context.lineTo(originPos.x, originPos.y);
         this.context.strokeStyle = color;
         this.context.stroke();
-    };
-    return NanObject;
-}());
+    }
+}
 
 /**
  * Sprite类
  * 渲染图片的对象都属于Sprite类，Sprite类属于Nan对象
  */
-var Sprite = /** @class */ (function (_super) {
-    __extends(Sprite, _super);
+class Sprite extends NanObject {
     /**
      * 构造函数
      * @param name 对象名称
      * @param transform 变换信息
      * @param image 图像
      */
-    function Sprite(transform, image, autoSize) {
-        if (autoSize === void 0) { autoSize = true; }
-        var _this = _super.call(this, transform) || this;
-        _this.image = image;
+    constructor(transform, image, autoSize = true) {
+        super(transform);
+        this.image = image;
         if (autoSize) {
-            _this.transform.size = new Vector(image.width, image.height);
+            this.transform.size = new Vector(image.width, image.height);
         }
         else {
-            _this.transform.size = transform.size;
+            this.transform.size = transform.size;
         }
-        return _this;
     }
     /**
      * 内部帧更新函数
      */
-    Sprite.prototype.update = function () {
+    update() {
         this.context.save();
         this.context.beginPath();
-        _super.prototype.update.call(this);
+        super.update();
         this.context.drawImage(this.image, this.transform.position.x, this.transform.position.y, this.transform.size.x, this.transform.size.y);
         this.context.closePath();
         this.context.restore();
-    };
+    }
     /**
      * 设置图像
      * @param image 图像
      */
-    Sprite.prototype.setImage = function (image) {
+    setImage(image) {
         this.image = image;
-    };
-    return Sprite;
-}(NanObject));
-
-var NText = /** @class */ (function (_super) {
-    __extends(NText, _super);
-    function NText(transform, text, color) {
-        if (color === void 0) { color = 'black'; }
-        var _this = _super.call(this, transform) || this;
-        _this.autoUpdateWidth = true;
-        _this.text = text;
-        _this.color = color;
-        return _this;
     }
-    NText.prototype.update = function () {
+}
+
+class NText extends NanObject {
+    constructor(transform, text, color = 'black') {
+        super(transform);
+        this.autoUpdateWidth = true;
+        this.text = text;
+        this.color = color;
+    }
+    update() {
         this.context.save();
         this.context.beginPath();
-        _super.prototype.update.call(this);
-        this.context.font = "".concat(this.transform.size.y, "px serif");
+        super.update();
+        this.context.font = `${this.transform.size.y}px serif`;
         if (this.autoUpdateWidth) {
-            var textMesure = this.context.measureText(this.text);
+            const textMesure = this.context.measureText(this.text);
             this.transform.size.x = textMesure.width;
         }
         this.context.fillStyle = this.color;
         this.context.fillText(this.text, this.transform.position.x, this.transform.position.y + this.transform.size.y);
         this.context.closePath();
         this.context.restore();
-    };
-    return NText;
-}(NanObject));
+    }
+}
 
-var NLine = /** @class */ (function (_super) {
-    __extends(NLine, _super);
+class NLine extends NanObject {
     /**
      *
      * @param transform 变换信息
      * @param path 线段路径信息，必须要一个二维数组（Vector）的二维数组。path.x为起始点,path.y为结束点
      */
-    function NLine(transform, path, color) {
-        if (color === void 0) { color = 'black'; }
-        var _this = _super.call(this, transform) || this;
-        _this.width = 1;
-        _this.transform.size.x = Math.abs(path.x.x - path.y.x);
-        _this.transform.size.y = Math.abs(path.x.y - path.y.y);
-        _this = _super.call(this, transform) || this;
-        _this.path = path;
-        _this.color = color;
-        return _this;
+    constructor(transform, path, color = 'black') {
+        super(transform);
+        this.width = 1;
+        this.transform.size.x = Math.abs(path.x.x - path.y.x);
+        this.transform.size.y = Math.abs(path.x.y - path.y.y);
+        this.path = path;
+        this.color = color;
     }
-    NLine.prototype.update = function () {
+    update() {
         this.context.save();
         this.context.beginPath();
-        _super.prototype.update.call(this);
-        var pos = this.transform.position;
+        super.update();
+        const pos = this.transform.position;
         this.context.strokeStyle = this.color;
         this.context.lineWidth = this.width;
         this.context.moveTo(this.path.x.x + pos.x, this.path.x.y + pos.y);
@@ -552,12 +537,10 @@ var NLine = /** @class */ (function (_super) {
         this.context.stroke();
         this.context.closePath();
         this.context.restore();
-    };
-    return NLine;
-}(NanObject));
+    }
+}
 
-var Polygon = /** @class */ (function (_super) {
-    __extends(Polygon, _super);
+class Polygon extends NanObject {
     /**
      * 多边形
      * @param transform 变换信息
@@ -565,33 +548,30 @@ var Polygon = /** @class */ (function (_super) {
      * @param renderMethod 绘制方法 fill为实心 stroke为描边
      * @param color 颜色
      */
-    function Polygon(transform, angles, renderMethod, color) {
-        if (renderMethod === void 0) { renderMethod = 'fill'; }
-        if (color === void 0) { color = '#000000'; }
-        var _this = _super.call(this, transform) || this;
+    constructor(transform, angles, renderMethod = 'fill', color = '#000000') {
+        super(transform);
         // 启始角度 （弧度制）
-        _this.startAngles = 0;
+        this.startAngles = 0;
         // 描边像素
-        _this.lineWidth = 1;
-        _this.angles = angles;
-        _this.renderMethod = renderMethod;
-        _this.color = color;
-        _this.lineColor = color;
-        _this.offsetX = _this.transform.size.x / 2;
-        _this.offsetY = _this.transform.size.x / 2;
-        return _this;
+        this.lineWidth = 1;
+        this.angles = angles;
+        this.renderMethod = renderMethod;
+        this.color = color;
+        this.lineColor = color;
+        this.offsetX = this.transform.size.x / 2;
+        this.offsetY = this.transform.size.x / 2;
     }
-    Polygon.prototype.update = function () {
+    update() {
         this.context.save();
         this.context.beginPath();
-        _super.prototype.update.call(this);
+        super.update();
         this.context.lineWidth = this.lineWidth;
-        var ang = (2 * Math.PI) / this.angles;
-        for (var i = 0; i < this.angles; i += 1) {
-            var x = (Math.cos(ang * i + this.startAngles)
+        const ang = (2 * Math.PI) / this.angles;
+        for (let i = 0; i < this.angles; i += 1) {
+            const x = (Math.cos(ang * i + this.startAngles)
                 * this.transform.size.x) / 2
                 + this.transform.position.x + this.offsetX;
-            var y = (Math.sin(ang * i + this.startAngles)
+            const y = (Math.sin(ang * i + this.startAngles)
                 * this.transform.size.y) / 2
                 + this.transform.position.y + this.offsetY;
             this.context.lineTo(x, y);
@@ -613,26 +593,21 @@ var Polygon = /** @class */ (function (_super) {
         }
         this.context.closePath();
         this.context.restore();
-    };
-    return Polygon;
-}(NanObject));
-
-var Rect = /** @class */ (function (_super) {
-    __extends(Rect, _super);
-    function Rect(transform, renderMethod, color) {
-        if (renderMethod === void 0) { renderMethod = 'fill'; }
-        if (color === void 0) { color = 'black'; }
-        var _this = _super.call(this, transform) || this;
-        _this.lineColor = 'yellow';
-        _this.lineWidth = 1;
-        _this.color = color;
-        _this.renderMethod = renderMethod;
-        return _this;
     }
-    Rect.prototype.update = function () {
+}
+
+class Rect extends NanObject {
+    constructor(transform, renderMethod = 'fill', color = 'black') {
+        super(transform);
+        this.lineColor = 'yellow';
+        this.lineWidth = 1;
+        this.color = color;
+        this.renderMethod = renderMethod;
+    }
+    update() {
         this.context.save();
         this.context.beginPath();
-        _super.prototype.update.call(this);
+        super.update();
         this.context.rect(this.transform.position.x, this.transform.position.y, this.transform.size.x, this.transform.size.y);
         switch (this.renderMethod) {
             case 'fill':
@@ -650,22 +625,18 @@ var Rect = /** @class */ (function (_super) {
         }
         this.context.closePath();
         this.context.restore();
-    };
-    return Rect;
-}(NanObject));
-
-var Utils = /** @class */ (function () {
-    function Utils() {
     }
-    Utils.getRandomColor = function () {
-        var colorStr = '#';
-        var randomArr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
-        for (var i = 0; i < 6; i += 1) {
+}
+
+class Utils {
+    static getRandomColor() {
+        let colorStr = '#';
+        const randomArr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
+        for (let i = 0; i < 6; i += 1) {
             colorStr += randomArr[Math.ceil(Math.random() * (15 - 0) + 0)];
         }
         return colorStr;
-    };
-    return Utils;
-}());
+    }
+}
 
-export { GameObject, NLine, NText, Nan$1 as Nan, NanObject, Polygon, Rect, Sprite, Transform, Utils, Vector };
+export { GameObject, NLine, NText, Nan, NanObject, Polygon, Rect, Sprite, Transform, Utils, Vector };
