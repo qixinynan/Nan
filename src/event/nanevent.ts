@@ -1,5 +1,5 @@
-import Nan from "../nan";
+import Nan from '../nan';
 
-export default class NanEvent {  
+export default class NanEvent {
   nan: Nan = Nan.getInstance();
 }

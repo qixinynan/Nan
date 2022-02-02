@@ -1,7 +1,9 @@
-import EventMouse from "./event_mouse";
+import EventMouse from './event_mouse';
 
-export default class EventManager {  
+export default class EventManager {
+  public eventMouse!: EventMouse;
+
   public init() {
-    let eventMouse = new EventMouse();    
+    this.eventMouse = new EventMouse();
   }
 }

@@ -1,4 +1,4 @@
-import NanEvent from "./nanevent";
+import NanEvent from './nanevent';
 export default class EventMouse extends NanEvent {
     private isDraging;
     private isMouseDown;
@@ -12,5 +12,5 @@ export default class EventMouse extends NanEvent {
      * 监听滚轮事件
      * 缩放功能
      */
-    onWheel(e: WheelEvent): void;
+    static onWheel(e: WheelEvent): void;
 }

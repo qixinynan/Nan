@@ -9,7 +9,7 @@ import Rect from './object/rect';
 import Vector from './utils/vector';
 import Transform from './utils/transform';
 import Utils from './utils/utils';
-export { Nan, //framework
-GameObject, NanObject, //base
-Sprite, NText, NLine, Polygon, Rect, //object
-Utils, Vector, Transform };
+export { Nan, // framework
+GameObject, NanObject, // base
+Sprite, NText, NLine, Polygon, Rect, // object
+Utils, Vector, Transform, };

@@ -1,4 +1,4 @@
-import Nan from "../nan";
+import Nan from '../nan';
 export default class NanEvent {
     nan: Nan;
 }

@@ -7,17 +7,21 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup -c",
-    "dev": "rollup -c -w"
+    "dev": "rollup -c -w",
+    "lint": "eslint . --ext .ts,.js",
+    "lint:fix": "eslint . --ext .ts,.js --fix"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.10.2",
+    "@typescript-eslint/parser": "^5.10.2",
+    "eslint": "^8.8.0",
+    "eslint-config-airbnb-base": "^15.0.0",
     "rollup": "^2.63.0",
     "rollup-plugin-typescript2": "^0.31.1",
     "rollup-watch": "^3.2.2",
     "tslib": "^2.3.1",
     "typescript": "^4.5.4"
-  },
-  "dependencies": {    
   }
 }

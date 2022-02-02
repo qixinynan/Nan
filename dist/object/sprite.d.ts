@@ -1,5 +1,5 @@
-import NanObject from "./nanobject";
-import Transform from "../utils/transform";
+import NanObject from './nanobject';
+import Transform from '../utils/transform';
 /**
  * Sprite类
  * 渲染图片的对象都属于Sprite类，Sprite类属于Nan对象
@@ -16,7 +16,7 @@ export default class Sprite extends NanObject {
     /**
      * 内部帧更新函数
      */
-    _update(): Promise<void>;
+    update(): void;
     /**
      * 设置图像
      * @param image 图像

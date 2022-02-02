@@ -1,4 +1,4 @@
-import Vector from "./vector";
+import Vector from './vector';
 /**
  * 变换信息
  * 变换信息类中保存的物体的位置和旋转角度等信息

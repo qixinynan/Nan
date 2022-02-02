@@ -33,19 +33,19 @@ export default class Nan {
      * @returns Canvas渲染器
      */
     getContext(): CanvasRenderingContext2D;
-    clear(): void;
+    static clear(): void;
     /**
      * 更新
      */
-    static update(): Promise<void>;
-    /**
-     * 渲染
-     */
-    static render(): Promise<boolean>;
+    static update(): void;
     /**
      * update执行后执行
      */
-    lateUpdate(): void;
+    private static updated;
+    /**
+     * 渲染
+     */
+    static render(): boolean;
     /**
      * 添加GameObject对象
      * @param obj GameObject对象

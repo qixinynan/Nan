@@ -1,5 +1,5 @@
-import Transform from "utils/transform";
-import NanObject from "./nanobject";
+import Transform from '../utils/transform';
+import NanObject from './nanobject';
 export default class Polygon extends NanObject {
     angles: number;
     renderMethod: string;
@@ -17,5 +17,5 @@ export default class Polygon extends NanObject {
      * @param color 颜色
      */
     constructor(transform: Transform, angles: number, renderMethod?: string, color?: string);
-    _update(): Promise<void>;
+    update(): void;
 }

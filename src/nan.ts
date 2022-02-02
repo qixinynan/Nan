@@ -1,36 +1,40 @@
 import Vector from './utils/vector';
 import GameObject from './object/gameobject';
-import NanObject from './object/nanobject'
-import Sprite from './object/sprite'
 import EventManager from './event/eventmanager';
 
 export default class Nan {
+  private static instance: unknown; // 单例
 
-  private static instance: Nan; //单例
-  private fps: number = 30; //帧率
+  private fps = 30; // 帧率
+
   private eventManager: EventManager = new EventManager();
-  private lastUpdateTime: number = 0;
+
+  private lastUpdateTime = 0;
 
   public originPosition: Vector<number> = new Vector(0, 0);
+
   public originScale: Vector<number> = new Vector(1, 1);
-  public context: CanvasRenderingContext2D; //Canvas渲染器
-  public objList: Array<GameObject> = []; //已加载的物体列表
-  public canvasDraggable: boolean = true; //画布可否可拖拽
-  public canvasScalable: boolean = true; //画布是否可缩放
-  public autoUpdate: boolean = false;
+
+  public context: CanvasRenderingContext2D; // Canvas渲染器
+
+  public objList: Array<GameObject> = []; // 已加载的物体列表
+
+  public canvasDraggable = true; // 画布可否可拖拽
+
+  public canvasScalable = true; // 画布是否可缩放
+
+  public autoUpdate = false;
+
   public scale = 1;
+
   /**
    *  构造函数初始化
    * @param canvas Canvas对象
    * @param fps 刷新帧率
    */
   constructor(canvas: HTMLCanvasElement) {
-    if (Nan.instance)
-      console.error("Nan is already created, You can use getInstance() to get it");
-    else
-      Nan.instance = this;
-    if (!canvas)
-      console.error("Canvas can't be null")
+    if (Nan.instance) { console.error('Nan is already created, You can use getInstance() to get it'); } else { Nan.instance = this; }
+    if (!canvas) { console.error("Canvas can't be null"); }
     this.context = canvas.getContext('2d') as CanvasRenderingContext2D;
     this.init();
   }
@@ -50,7 +54,7 @@ export default class Nan {
    * @returns 单例
    */
   static getInstance(): Nan {
-    return Nan.instance;
+    return Nan.instance as Nan;
   }
 
   /**
@@ -62,50 +66,57 @@ export default class Nan {
   }
 
   // 清屏
-  clear() {
-    let nan = Nan.getInstance();
-    let cleanX = nan.originPosition.x / nan.scale,
-      cleanY = nan.originPosition.y / nan.scale,
-      canvasWidth = nan.context.canvas.width,
-      canvasHeight = nan.context.canvas.height;
-    nan.context.clearRect(cleanX, cleanY, canvasWidth / nan.originScale.x, canvasHeight / nan.originScale.y); //清屏
+  static clear() {
+    const nan = Nan.getInstance();
+    const cleanX = nan.originPosition.x / nan.scale;
+    const cleanY = nan.originPosition.y / nan.scale;
+    const canvasWidth = nan.context.canvas.width;
+    const canvasHeight = nan.context.canvas.height;
+    nan.context.clearRect(
+      cleanX,
+      cleanY,
+      canvasWidth / nan.originScale.x,
+      canvasHeight / nan.originScale.y,
+    ); // 清屏
   }
 
   /**
    * 更新
    */
-  public static async update() {
-    let nan = Nan.getInstance();
-    nan.clear();
+  public static update() {
+    const nan = Nan.getInstance();
+    Nan.clear();
 
-    for (let i = 0; i < nan.objList.length; i++) {
-      let gameObj: GameObject = nan.objList[i];
-      await gameObj._update();
+    for (let i = 0; i < nan.objList.length; i += 1) {
+      const gameObject: GameObject = nan.objList[i];
+      gameObject.beforeUpdate();
+      gameObject.updateNanObjects();
     }
-    await nan.lateUpdate();
     nan.lastUpdateTime = Date.now();
+  }
+
+  /**
+   * update执行后执行
+   */
+  private static updated() {
+    const nan = Nan.getInstance();
+    for (let i = 0; i < nan.objList.length; i += 1) {
+      const gameObject: GameObject = nan.objList[i];
+      gameObject.updated();
+    }
   }
 
   /**
    * 渲染
    */
-  public static async render(): Promise<boolean> {
-    let nan = Nan.getInstance();
+  public static render() {
+    const nan = Nan.getInstance();
     if (Date.now() - nan.lastUpdateTime > 30) {
-      await this.update();
+      this.update();
+      this.updated();
       return true;
     }
     return false;
-  }
-  /**
-   * update执行后执行
-   */
-  lateUpdate() {
-    let nan = Nan.getInstance();
-    for (let i = 0; i < nan.objList.length; i++) {
-      let gameObj: GameObject = nan.objList[i];
-      gameObj.lateUpdate();
-    }
   }
 
   /**
@@ -129,9 +140,9 @@ export default class Nan {
    */
   findGameObject(name: string): GameObject | null {
     let result: GameObject | null = null;
-    for (let i = 0; i < this.objList.length; i++) {
-      let obj: GameObject = this.objList[i];
-      if (obj.name == name) {
+    for (let i = 0; i < this.objList.length; i += 1) {
+      const obj: GameObject = this.objList[i];
+      if (obj.name === name) {
         result = obj;
       }
     }
@@ -145,7 +156,10 @@ export default class Nan {
    */
   translateOrigin(x: number, y: number) {
     this.context.translate(x, y);
-    this.originPosition = new Vector(this.originPosition.x - x * this.scale, this.originPosition.y - y * this.scale);
+    this.originPosition = new Vector(
+      this.originPosition.x - x * this.scale,
+      this.originPosition.y - y * this.scale,
+    );
     if (!this.autoUpdate) {
       Nan.render();
     }
@@ -157,7 +171,7 @@ export default class Nan {
    * @param y x
    */
   moveOrigin(x: number, y: number) {
-    this.translateOrigin(this.originPosition.x + x, this.originPosition.y + y)
+    this.translateOrigin(this.originPosition.x + x, this.originPosition.y + y);
   }
 
   /**
@@ -165,13 +179,13 @@ export default class Nan {
    * @param x x
    * @param y x
    */
-  //TODO 以中心缩放
+  // TODO 以中心缩放
   scaleOrigin(x: number) {
     if (this.scale < 0.1 && x < 1) return;
     if (this.scale > 3 && x > 1) return;
     this.scale *= x;
     this.context.scale(x, x);
-    this.originScale = new Vector(this.originScale.x * x, this.originScale.y * x)
+    this.originScale = new Vector(this.originScale.x * x, this.originScale.y * x);
     if (!this.autoUpdate) {
       Nan.render();
     }
