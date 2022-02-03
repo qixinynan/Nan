@@ -6,7 +6,8 @@ export default class NLine extends NanObject {
   public path: Vector<Vector<number>>;
 
   public color: string;
-  public width: number = 1;
+
+  public width = 1;
 
   /**
    *

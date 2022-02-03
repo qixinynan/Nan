@@ -52,7 +52,6 @@ class EventMouse extends NanEvent {
                 && xOffset >= 0
                 && xOffset <= obj.collider.x * scale
                 && yOffset <= obj.collider.y * scale) {
-                nan.selectedObj = obj;
                 if (obj.onClick) {
                     obj.onClick();
                 }
@@ -277,55 +276,6 @@ class Nan {
         }
     }
 }
-// scaleOrigin(scaleBy: number) {
-//   if (this.scale < 0.1 && scaleBy < 1) return;
-//   if (this.scale > 3 && scaleBy > 1) return;
-//   this.scale *= scaleBy;
-//   let canvas = this.getContext().canvas;
-//   var canvasBound = this.context.canvas.getBoundingClientRect()
-//   // this.scale *= scaleBy;
-//   console.log(this.scale)
-//   // this.scaleAt(this.originScale.x / 2, this.originScale.y / 2, x);
-//   this.context.scale(scaleBy, scaleBy);
-//   this.originScale = new Vector(this.originScale.x * scaleBy, this.originScale.y * scaleBy);
-//   // if (this.selectedObj) {
-//   //   let screenpos = this.toScreen(this.selectedObj.transform.position.x, this.selectedObj.transform.position.y);
-//   let xcenter = canvasBound.width / 2;
-//   let ycenter = canvasBound.height / 2;
-//   //   let screendiffx = 0;
-//   //   let screendiffy = 0;
-//   //   if(screenpos.x<0){
-//   //     screendiffx = -screenpos.x;
-//   //   }
-//   //   if(screenpos.x<0 || screenpos.x>canvasBound.width){
-//   //     screendiffx = -screenpos.x;
-//   //   }
-//   let centerWorldPos = this.toWorld(xcenter, ycenter);
-//   let x1 = centerWorldPos.x - (centerWorldPos.x - this.originPosition.x) * this.scale;
-//   let y1 = centerWorldPos.x - (centerWorldPos.x - this.originPosition.x) * this.scale;
-//   let diffx = (x1 - this.originPosition.x);
-//   let diffy = (y1 - this.originPosition.y);
-//   //   //   let diffy = (canvasBound.height / 2 + y1) / this.scale;
-//   //   // console.log(this.originPosition, this.selectedObj.transform.position, x1, y1, diffx, diffy)
-//   //   console.log(this.originPosition, this.selectedObj.transform.position, centerWorldPos, diffx, diffy)
-//   // this.translateOrigin(diffx, diffy);
-//   this.context.translate(-diffx, -diffy);
-//   this.originPosition = new Vector(this.originPosition.x + diffx * this.scale, this.originPosition.y + diffy * this.scale);
-//   // }
-//   if (!this.autoUpdate) {
-//     Nan.render();
-//   }
-// }
-// toWorld(x: number, y: number) {  // convert to world coordinates
-//   x = (x - this.originPosition.x) / this.scale;
-//   y = (y - this.originPosition.y) / this.scale;
-//   return { x, y };
-// }
-// toScreen(x: number, y: number) {
-//   x = x * this.scale + this.originPosition.x;
-//   y = y * this.scale + this.originPosition.y;
-//   return { x, y };
-// }
 
 /**
  * 变换信息

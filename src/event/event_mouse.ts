@@ -47,7 +47,6 @@ export default class EventMouse extends NanEvent {
         && xOffset <= obj.collider.x * scale
         && yOffset <= obj.collider.y * scale
       ) {
-        nan.selectedObj = obj;
         if (obj.onClick) {
           obj.onClick();
         }
