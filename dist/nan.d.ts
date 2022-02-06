@@ -5,6 +5,10 @@ export default class Nan {
     private fps;
     private eventManager;
     private lastUpdateTime;
+    private mousePosX;
+    private mousePosY;
+    private leftTopObj;
+    private rightBottomObj;
     originPosition: Vector<number>;
     originScale: Vector<number>;
     context: CanvasRenderingContext2D;
@@ -76,4 +80,11 @@ export default class Nan {
      * @param y x
      */
     scaleOrigin(x: number): void;
+    translateWhenScale(scale: number): void;
+    getMousePos(): {
+        x: number;
+        y: number;
+    };
+    setMousePos(x: number, y: number): void;
+    setBoundaryObj(leftTop: GameObject, rightBottom: GameObject): void;
 }

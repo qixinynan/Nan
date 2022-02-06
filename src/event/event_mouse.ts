@@ -90,11 +90,21 @@ export default class EventMouse extends NanEvent {
     };
   }
 
+  static saveMousePos(e: MouseEvent) {
+    const nan = Nan.getInstance();
+    const canvasBound = nan.context.canvas.getBoundingClientRect();
+    const x = e.clientX - canvasBound.left;
+    const y = e.clientY - canvasBound.top;
+
+    nan.setMousePos(x, y);
+  }
+
   /**
    * 监听滚轮事件
    * 缩放功能
    */
   static onWheel(e: WheelEvent) {
+    EventMouse.saveMousePos(e);
     const nan = Nan.getInstance();
     if (e.deltaY > 0) {
       nan.scaleOrigin(0.8);

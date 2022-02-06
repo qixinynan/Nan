@@ -1,6 +1,6 @@
 /* eslint-disable import/extensions */
 /* eslint-disable no-undef */
-import { Nan, Transform, Vector } from '../../dist/nan.js';
+import { Nan, Transform, Vector,GameObject } from '../../dist/nan.js';
 // eslint-disable-next-line import/no-cycle
 import MapItem from '../obj/mapitem.js';
 
@@ -28,6 +28,9 @@ export default class MapManager {
 
   init() {
     const nan = Nan.getInstance();
+    let obj1;
+    let obj2;
+
     for (let i = 0; i < this.widthCount; i += 1) {
       for (let j = 0; j < this.heightCount; j += 1) {
         const offsetX = j % 2 === 0 ? 0 : Math.sqrt(this.bc * this.bc * 3);
@@ -42,8 +45,14 @@ export default class MapManager {
         };
 
         nan.add(obj);
+        if(i==0 && j==0){
+          obj1 = obj;
+        }else if(i==this.widthCount-1 && j==this.heightCount-1){
+          obj2 = obj;
+        }
       }
     }
+    nan.setBoundaryObj(obj1, obj2);
     Nan.update();
   }
 

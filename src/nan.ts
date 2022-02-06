@@ -10,6 +10,10 @@ export default class Nan {
   private eventManager: EventManager = new EventManager();
 
   private lastUpdateTime = 0;
+  private mousePosX = 0;//canvas中的screen位置
+  private mousePosY = 0;//canvas中的screen位置
+  private leftTopObj: GameObject | undefined; //左上边界对象
+  private rightBottomObj: GameObject | undefined; //右下边界对象
 
   public originPosition: Vector<number> = new Vector(0, 0);
 
@@ -183,13 +187,59 @@ export default class Nan {
    */
   // TODO 以中心缩放
   scaleOrigin(x: number) {
-    if (this.scale < 0.1 && x < 1) return;
-    if (this.scale > 3 && x > 1) return;
+    if (this.scale < 0.12 && x < 1) return;
+    if (this.scale > 4 && x > 1) return;
+
+    let oldscale = this.scale;
     this.scale *= x;
     this.context.scale(x, x);
     this.originScale = new Vector(this.originScale.x * x, this.originScale.y * x);
+    this.translateWhenScale(oldscale); //在新的scale比例下，原点位置的迁移
     if (!this.autoUpdate) {
       Nan.render();
     }
+  }
+
+  translateWhenScale(scale: number) {
+    let mousePos = this.getMousePos();
+    const canvasBound = this.context.canvas.getBoundingClientRect();
+    let originTrans = this.originPosition;
+    let transX = (-this.originPosition.x - mousePos.x) * ((this.scale - scale) / scale) / this.scale;
+    let transY = (-this.originPosition.y - mousePos.y) * ((this.scale - scale) / scale) / this.scale;
+
+    this.translateOrigin(transX, transY);
+
+    if (this.leftTopObj) { //左上对象超过右下边界
+      if (-this.originPosition.x > canvasBound.width - 10 || -this.originPosition.y > canvasBound.height - 10) {
+        this.translateOrigin(this.originPosition.x * this.scale, this.originPosition.y * this.scale);
+      }
+    }
+
+    if (this.rightBottomObj) { //右下对象超过左上边界
+      if (this.originPosition.x / this.scale > this.rightBottomObj.transform.position.x || this.originPosition.y / this.scale > this.rightBottomObj.transform.position.y) {
+        console.log("trans2", this.originPosition, this.rightBottomObj.transform.position)
+        this.translateOrigin(this.originPosition.x, this.originPosition.y);
+      }
+    }
+
+  }
+
+  //取鼠标的screen相对位置
+  getMousePos() {
+    let x = this.mousePosX;
+    let y = this.mousePosY;
+    return { x, y };
+  }
+
+  //设置鼠标的screen位置
+  setMousePos(x: number, y: number) {
+    this.mousePosX = x;
+    this.mousePosY = y;
+  }
+
+  setBoundaryObj(leftTop: GameObject, rightBottom: GameObject) {
+    this.leftTopObj = leftTop;
+    this.rightBottomObj = rightBottom;
+    console.log(leftTop.transform.position, rightBottom.transform.position)
   }
 }
