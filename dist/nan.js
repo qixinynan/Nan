@@ -131,8 +131,8 @@ class Nan {
         this.fps = 30; // 帧率
         this.eventManager = new EventManager();
         this.lastUpdateTime = 0;
-        this.mousePosX = 0; //canvas中的screen位置
-        this.mousePosY = 0; //canvas中的screen位置
+        this.mousePosX = 0; // canvas中的screen位置
+        this.mousePosY = 0; // canvas中的screen位置
         this.originPosition = new Vector(0, 0);
         this.originScale = new Vector(1, 1);
         this.objList = []; // 已加载的物体列表
@@ -278,41 +278,44 @@ class Nan {
             return;
         if (this.scale > 4 && x > 1)
             return;
-        let oldscale = this.scale;
+        const oldscale = this.scale;
         this.scale *= x;
         this.context.scale(x, x);
         this.originScale = new Vector(this.originScale.x * x, this.originScale.y * x);
-        this.translateWhenScale(oldscale); //在新的scale比例下，原点位置的迁移
+        this.translateWhenScale(oldscale); // 在新的scale比例下，原点位置的迁移
         if (!this.autoUpdate) {
             Nan.render();
         }
     }
     translateWhenScale(scale) {
-        let mousePos = this.getMousePos();
+        const mousePos = this.getMousePos();
         const canvasBound = this.context.canvas.getBoundingClientRect();
-        this.originPosition;
-        let transX = (-this.originPosition.x - mousePos.x) * ((this.scale - scale) / scale) / this.scale;
-        let transY = (-this.originPosition.y - mousePos.y) * ((this.scale - scale) / scale) / this.scale;
+        const transX = (-this.originPosition.x - mousePos.x)
+            * (((this.scale - scale) / scale) / this.scale);
+        const transY = (-this.originPosition.y - mousePos.y)
+            * (((this.scale - scale) / scale) / this.scale);
         this.translateOrigin(transX, transY);
-        if (this.leftTopObj) { //左上对象超过右下边界
-            if (-this.originPosition.x > canvasBound.width - 10 || -this.originPosition.y > canvasBound.height - 10) {
+        if (this.leftTopObj) { // 左上对象超过右下边界
+            if (-this.originPosition.x > canvasBound.width - 10
+                || -this.originPosition.y > canvasBound.height - 10) {
                 this.translateOrigin(this.originPosition.x * this.scale, this.originPosition.y * this.scale);
             }
         }
-        if (this.rightBottomObj) { //右下对象超过左上边界
-            if (this.originPosition.x / this.scale > this.rightBottomObj.transform.position.x || this.originPosition.y / this.scale > this.rightBottomObj.transform.position.y) {
-                console.log("trans2", this.originPosition, this.rightBottomObj.transform.position);
+        if (this.rightBottomObj) { // 右下对象超过左上边界
+            if (this.originPosition.x / this.scale > this.rightBottomObj.transform.position.x
+                || this.originPosition.y / this.scale > this.rightBottomObj.transform.position.y) {
+                console.log('trans2', this.originPosition, this.rightBottomObj.transform.position);
                 this.translateOrigin(this.originPosition.x, this.originPosition.y);
             }
         }
     }
-    //取鼠标的screen相对位置
+    // 取鼠标的screen相对位置
     getMousePos() {
-        let x = this.mousePosX;
-        let y = this.mousePosY;
+        const x = this.mousePosX;
+        const y = this.mousePosY;
         return { x, y };
     }
-    //设置鼠标的screen位置
+    // 设置鼠标的screen位置
     setMousePos(x, y) {
         this.mousePosX = x;
         this.mousePosY = y;

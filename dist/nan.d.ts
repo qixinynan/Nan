@@ -16,7 +16,6 @@ export default class Nan {
     canvasDraggable: boolean;
     canvasScalable: boolean;
     autoUpdate: boolean;
-    selectedObj: GameObject | undefined;
     scale: number;
     /**
      *  构造函数初始化

@@ -1,6 +1,8 @@
 /* eslint-disable import/extensions */
 /* eslint-disable no-undef */
-import { Nan, Transform, Vector,GameObject } from '../../dist/nan.js';
+import {
+  Nan, Transform, Vector,
+} from '../../dist/nan.js';
 // eslint-disable-next-line import/no-cycle
 import MapItem from '../obj/mapitem.js';
 
@@ -45,9 +47,9 @@ export default class MapManager {
         };
 
         nan.add(obj);
-        if(i==0 && j==0){
+        if (i === 0 && j === 0) {
           obj1 = obj;
-        }else if(i==this.widthCount-1 && j==this.heightCount-1){
+        } else if (i === this.widthCount - 1 && j === this.heightCount - 1) {
           obj2 = obj;
         }
       }
@@ -73,7 +75,7 @@ export default class MapManager {
     let height = document.getElementById('height').value;
 
     if (height > mapManager.maxHeight) {
-      alert(`最大高度不能高于${mapManager.maxHeight}`);
+      console.log(`最大高度不能高于${mapManager.maxHeight}`);
       height = mapManager.maxHeight;
     }
     obj.height = height;
