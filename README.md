@@ -4,44 +4,7 @@
 
 ## 如何使用
 
-南非常容易使用，首先你需要克隆南的源码 （由于南仍处于开发中，所以并未发布 NPM 包）
-
-```bash
-git clone https://github.com/Qixinies/Nan.git //克隆
-cd Nan //进入目录
-npm install //安装所需依赖
-```
-
-你可以通过 `npm run dev` 来启动调试模式。在你修改代码框架代码后，它会自动帮你编译到为/dist/nan.js 文件。
-
-或者通过 `npm run build` 进行打包后手动部署到你的 Web 服务器,一般会打包到/dist 文件夹下。无论你选择的是调试服务器还是打包，index.html 都在/dist 目录下。
-
-南默认提供了一个丑陋的案例，你可以在 `/src/test.js` 查看其源码或进行修改。想要运行南提供的案例，你可能需要一个 Web 服务器，南推荐你使用 Visual Studio 的 Live Server 插件。这可以快速的搭建简易的调试用 Web 服务器
-
-```javascript
-import { Nan, NText, Transform, Vector, GameObject } from "./nan.js";
-class MyObject extends GameObject {
-  init() {
-    this.transform = new Transform(
-      new Vector(10, 10),
-      new Vector(0, 0),
-      new Vector(1, 1)
-    );
-  }
-
-  update = function update() {
-    let ntext = new NText(this.transform, "Hello World");
-    ntext.update = (obj) => {
-      obj.text = "现在时间: " + Date.now().toString();
-    };
-    return [ntext];
-  };
-}
-
-let nan = new Nan(document.getElementById("canvas"));
-nan.add(new MyObject("Name"));
-console.log(nan.objList);
-```
+TODO
 
 ## 对项目进行贡献
 
